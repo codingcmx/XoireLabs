@@ -1,10 +1,15 @@
+
 "use client";
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import MotionDiv from '@/components/motion/motion-div';
 import { ArrowRight, Zap } from 'lucide-react';
 import { useScroll, useTransform, motion } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import { generateImage, type GenerateImageInput } from '@/ai/flows/generate-image-flow';
+
+const ORIGINAL_ORB_IMAGE_URL = "https://placehold.co/400x400/00FF80/222222.png?text=AI+Orb";
+const ORB_IMAGE_AI_HINT = "glowing sphere";
 
 export default function HeroSection() {
   const targetRef = useRef<HTMLDivElement>(null);
@@ -12,6 +17,29 @@ export default function HeroSection() {
     target: targetRef,
     offset: ["start start", "end start"],
   });
+
+  const [orbImageUrl, setOrbImageUrl] = useState(ORIGINAL_ORB_IMAGE_URL);
+  const [isOrbImageLoading, setIsOrbImageLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchAiImage() {
+      setIsOrbImageLoading(true);
+      try {
+        const input: GenerateImageInput = {
+          promptText: ORB_IMAGE_AI_HINT,
+          originalPlaceholderUrl: ORIGINAL_ORB_IMAGE_URL,
+        };
+        const result = await generateImage(input);
+        setOrbImageUrl(result.imageDataUri);
+      } catch (error) {
+        console.error("Failed to generate AI image for hero orb:", error);
+        setOrbImageUrl(ORIGINAL_ORB_IMAGE_URL); // Fallback to placeholder on error
+      } finally {
+        setIsOrbImageLoading(false);
+      }
+    }
+    fetchAiImage();
+  }, []);
 
   // Simple parallax for background elements
   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
@@ -52,12 +80,13 @@ export default function HeroSection() {
         animate="animate"
       >
         <Image
-          src="https://placehold.co/400x400/00FF80/222222.png?text=AI+Orb"
+          src={orbImageUrl}
           alt="AI Orb"
           width={400}
           height={400}
-          className="rounded-full opacity-30 animate-pulse"
-          data-ai-hint="glowing sphere"
+          className={`rounded-full opacity-30 transition-opacity duration-500 ease-in-out ${isOrbImageLoading ? 'blur-md' : 'blur-0'} group-hover:animate-pulse`}
+          data-ai-hint={ORB_IMAGE_AI_HINT}
+          priority // Good to have for LCP images, but this one is mostly decorative
         />
         <div className="absolute inset-0 rounded-full shadow-[0_0_60px_20px_hsl(var(--primary)/0.4)]"></div>
       </motion.div>
