@@ -1,7 +1,7 @@
 import type {Config} from 'tailwindcss';
 
 export default {
-  darkMode: ['class'], // Kept for ShadCN components that might use it internally
+  darkMode: ['class'], 
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -88,24 +88,19 @@ export default {
             height: '0',
           },
         },
-        'pulse-glow': {
-          '0%, 100%': { opacity: '1', boxShadow: '0 0 5px hsl(var(--primary)), 0 0 10px hsl(var(--primary))' },
-          '50%': { opacity: '0.7', boxShadow: '0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary))' },
+        'pulse-glow': { // Adjusted to be more subtle
+          '0%, 100%': { opacity: '1', boxShadow: '0 0 3px hsl(var(--primary)/0.7), 0 0 6px hsl(var(--primary)/0.5)' },
+          '50%': { opacity: '0.8', boxShadow: '0 0 6px hsl(var(--primary)/0.5), 0 0 12px hsl(var(--primary)/0.3)' },
         },
-        'neon-flicker': {
-          '0%, 100%': { opacity: '1', textShadow: 'var(--neon-primary-glow)' },
-          '50%': { opacity: '0.8', textShadow: '0 0 3px hsl(var(--primary)), 0 0 7px hsl(var(--primary))' },
-        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'pulse-glow': 'pulse-glow 2s infinite ease-in-out',
-        'neon-flicker': 'neon-flicker 1.5s infinite alternate',
+        'pulse-glow': 'pulse-glow 2.5s infinite ease-in-out', // Slightly slower pulse
       },
-      boxShadow: {
-        'neon-primary': 'var(--neon-primary-glow)',
-        'neon-accent': 'var(--neon-accent-glow)',
+      boxShadow: { // Removed neon-specific box shadows
+         'soft-primary': '0 0 10px hsl(var(--primary)/0.3), 0 0 20px hsl(var(--primary)/0.2)',
+         'soft-accent': '0 0 10px hsl(var(--accent)/0.3), 0 0 20px hsl(var(--accent)/0.2)',
       }
     },
   },

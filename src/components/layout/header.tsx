@@ -18,7 +18,7 @@ export default function Header() {
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <BotMessageSquareIcon className="h-8 w-8 text-primary" />
-          <span className="font-headline text-2xl font-bold text-primary neon-text-primary">XOIRE</span>
+          <span className="font-headline text-2xl font-bold text-primary">XOIRE</span>
         </Link>
         
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -34,8 +34,8 @@ export default function Header() {
         </nav>
 
         <div className="hidden md:flex items-center space-x-2">
-            <Button variant="outline" className="neon-border-accent hover:shadow-neon-accent">Login</Button>
-            <Button className="animate-pulse-glow">Get Started</Button>
+            <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground">Login</Button>
+            <Button>Get Started</Button>
         </div>
 
         <div className="md:hidden">
@@ -58,8 +58,8 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="flex flex-col space-y-2 pt-4">
-                    <Button variant="outline" className="neon-border-accent hover:shadow-neon-accent">Login</Button>
-                    <Button className="animate-pulse-glow">Get Started</Button>
+                    <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground">Login</Button>
+                    <Button>Get Started</Button>
                 </div>
               </nav>
             </SheetContent>

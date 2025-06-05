@@ -1,3 +1,4 @@
+
 "use client";
 import MotionDiv from '@/components/motion/motion-div';
 import { CheckCircle, Zap, Target, Brain, Users } from 'lucide-react';
@@ -60,13 +61,12 @@ export default function WhyXoireSection() {
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.8 }}
           >
-            {/* Placeholder for a 3D/abstract image */}
             <Image 
-              src="https://placehold.co/600x500/00FF80/222222.png?text=Abstract+AI" 
+              src="https://placehold.co/600x500/0A0A23/BF40BF.png?text=Abstract+AI" 
               alt="Why Xoire illustration"
               width={600}
               height={500}
-              className="rounded-lg shadow-xl object-cover w-full h-auto neon-border-primary"
+              className="rounded-lg shadow-xl object-cover w-full h-auto border-2 border-primary/40"
               data-ai-hint="abstract network"
             />
           </MotionDiv>

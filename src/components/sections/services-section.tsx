@@ -1,3 +1,4 @@
+
 "use client";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import MotionDiv from '@/components/motion/motion-div';
@@ -82,10 +83,10 @@ export default function ServicesSection() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
-              whileHover={{ scale: 1.05, rotateY: 5, transition: { duration: 0.3 } }}
+              whileHover={{ scale: 1.05, rotateY: 2, transition: { duration: 0.3 } }}
               className="h-full"
             >
-              <Card className="h-full glassmorphic group hover:shadow-neon-primary transition-all duration-300 ease-out">
+              <Card className="h-full glassmorphic group hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 ease-out">
                 <CardHeader className="items-center text-center">
                   <div className="p-4 bg-primary/10 rounded-full mb-4 border border-primary/30 group-hover:border-primary transition-colors">
                     <service.icon className="w-10 h-10 text-primary group-hover:animate-pulse" />

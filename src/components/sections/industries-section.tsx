@@ -1,3 +1,4 @@
+
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import MotionDiv from '@/components/motion/motion-div';
@@ -36,15 +37,14 @@ const itemVariants = {
 
 export default function IndustriesSection() {
   return (
-    <section id="industries" className="py-20 md:py-32 bg-gradient-to-b from-slate-900/30 to-background">
+    <section id="industries" className="py-20 md:py-32 bg-gradient-to-b from-indigo-900/20 to-background">
       <div className="container relative">
-         {/* Animated grid background */}
         <div className="absolute inset-0 z-0 opacity-5 overflow-hidden">
             <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] animate-spin-slow">
                 <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
-                            <path d="M 80 0 L 0 0 0 80" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.5"/>
+                            <path d="M 80 0 L 0 0 0 80" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.2"/>
                         </pattern>
                     </defs>
                     <rect width="100%" height="100%" fill="url(#grid)" />
@@ -78,11 +78,11 @@ export default function IndustriesSection() {
               variants={itemVariants}
               whileHover={{ 
                 y: -8, 
-                boxShadow: "0px 10px 30px -5px hsl(var(--accent) / 0.3)",
+                boxShadow: "0px 10px 30px -5px hsl(var(--accent) / 0.2)",
                 transition: { type: 'spring', stiffness: 300, damping: 15 } 
               }}
             >
-              <Card className="text-center glassmorphic group h-full neon-border-accent hover:border-accent transition-all duration-300">
+              <Card className="text-center glassmorphic group h-full border-accent/30 hover:border-accent transition-all duration-300">
                 <CardContent className="p-6 md:p-8 flex flex-col items-center justify-center h-full">
                   <div className="p-3 bg-accent/10 rounded-full mb-4 border border-accent/30 group-hover:border-accent transition-colors">
                      <industry.icon className="w-8 h-8 md:w-10 md:h-10 text-accent group-hover:scale-110 transition-transform duration-300" />

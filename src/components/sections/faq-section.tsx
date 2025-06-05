@@ -31,7 +31,7 @@ const faqs = [
 
 export default function FaqSection() {
   return (
-    <section id="faq" className="py-20 md:py-32 bg-gradient-to-b from-background to-slate-900/30">
+    <section id="faq" className="py-20 md:py-32 bg-gradient-to-b from-background to-indigo-900/20">
       <div className="container max-w-3xl">
         <MotionDiv 
           initial={{ opacity: 0, y: -20 }}

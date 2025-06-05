@@ -1,3 +1,4 @@
+
 "use client";
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,7 @@ const systems: System[] = [
     id: "tradetitan",
     name: "TradeTitan AI",
     description: "Automated high-frequency trading bot with adaptive learning algorithms.",
-    imageSrc: "https://placehold.co/600x400/222222/00FF80.png?text=TradeTitan",
+    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=TradeTitan", // Dark bg, Purple text
     aiHint: "trading graph",
     details: [
       { feature: "Real-time market analysis", benefit: "Maximizes profit opportunities 24/7." },
@@ -35,7 +36,7 @@ const systems: System[] = [
     id: "autonexus",
     name: "AutoNexus Flow",
     description: "Intelligent process automation for complex enterprise workflows.",
-    imageSrc: "https://placehold.co/600x400/222222/7DF9FF.png?text=AutoNexus",
+    imageSrc: "https://placehold.co/600x400/0A0A23/A0A0D0.png?text=AutoNexus", // Dark bg, Silver text
     aiHint: "flow chart",
     details: [
       { feature: "AI-driven decision making", benefit: "Optimizes operational efficiency." },
@@ -47,7 +48,7 @@ const systems: System[] = [
     id: "securemind",
     name: "SecureMind Sentinel",
     description: "AI-powered cybersecurity shield with predictive threat intelligence.",
-    imageSrc: "https://placehold.co/600x400/222222/00FF80.png?text=SecureMind",
+    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=SecureMind", // Dark bg, Purple text
     aiHint: "security shield",
     details: [
       { feature: "Behavioral anomaly detection", benefit: "Identifies and neutralizes novel threats." },
@@ -69,7 +70,7 @@ const itemVariants = {
 
 export default function SignatureSystemsSection() {
   return (
-    <section id="systems" className="py-20 md:py-32 bg-gradient-to-b from-background to-slate-900/30">
+    <section id="systems" className="py-20 md:py-32 bg-gradient-to-b from-background to-indigo-900/20">
       <div className="container">
         <MotionDiv 
           initial={{ opacity: 0, y: -20 }}
@@ -93,7 +94,7 @@ export default function SignatureSystemsSection() {
         >
           {systems.map((system) => (
             <MotionDiv key={system.id} variants={itemVariants}>
-              <Card className="glassmorphic group h-full flex flex-col overflow-hidden neon-border-accent hover:shadow-neon-accent transition-all duration-300 ease-out">
+              <Card className="glassmorphic group h-full flex flex-col overflow-hidden border-accent/30 hover:shadow-lg hover:shadow-accent/20 transition-all duration-300 ease-out">
                 <CardHeader className="p-0">
                   <Image
                     src={system.imageSrc}
@@ -111,20 +112,20 @@ export default function SignatureSystemsSection() {
                 <CardFooter className="p-6 pt-0">
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline" className="w-full group/button neon-border-primary hover:bg-primary/10 hover:text-primary hover:shadow-neon-primary">
+                      <Button variant="outline" className="w-full group/button border-primary/50 hover:bg-primary/10 hover:text-primary hover:shadow-md hover:shadow-primary/30">
                         <Eye className="mr-2 h-4 w-4 group-hover/button:animate-pulse" /> Launch System Demo
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[625px] glassmorphic neon-border-primary">
+                    <DialogContent className="sm:max-w-[625px] glassmorphic border-primary/50">
                       <DialogHeader>
-                        <DialogTitle className="font-headline text-3xl text-primary neon-text-primary">{system.name}</DialogTitle>
+                        <DialogTitle className="font-headline text-3xl text-primary">{system.name}</DialogTitle>
                         <DialogDescription className="text-muted-foreground">
                           {system.description} Dive deeper into the capabilities.
                         </DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-4 py-4">
                         <Image 
-                          src={system.imageSrc.replace("400","800x500")} // Larger image for modal
+                          src={system.imageSrc.replace("400","800x500")} 
                           alt={`${system.name} Detail`} 
                           width={800} 
                           height={500} 

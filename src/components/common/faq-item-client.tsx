@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ReactNode } from 'react';
@@ -5,14 +6,14 @@ import { useState, useRef } from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Volume2, Loader2, AlertTriangle } from "lucide-react";
-import { aiVoiceAssistant } from '@/ai/flows/ai-voice-assistant'; // Ensure correct path
+import { aiVoiceAssistant } from '@/ai/flows/ai-voice-assistant'; 
 import { useToast } from "@/hooks/use-toast";
 
 interface FaqItemClientProps {
   value: string;
   question: string;
-  answer: ReactNode; // Can be string or JSX
-  answerTextForAudio: string; // Plain text version of the answer for TTS
+  answer: ReactNode; 
+  answerTextForAudio: string; 
 }
 
 export default function FaqItemClient({ value, question, answer, answerTextForAudio }: FaqItemClientProps) {
@@ -52,8 +53,7 @@ export default function FaqItemClient({ value, question, answer, answerTextForAu
         description: `Could not play audio: ${errorMessage}`,
         variant: "destructive",
       });
-    } finally {
-      // setIsLoading(false); // This is handled by onended or if error
+      setIsLoading(false); 
     }
   };
 
@@ -70,7 +70,7 @@ export default function FaqItemClient({ value, question, answer, answerTextForAu
             size="sm"
             onClick={handlePlayAudio}
             disabled={isLoading}
-            className="neon-border-accent hover:shadow-neon-accent group"
+            className="border-accent hover:bg-accent/10 hover:text-accent-foreground group"
             >
             {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

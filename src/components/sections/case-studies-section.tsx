@@ -1,3 +1,4 @@
+
 "use client";
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,21 +18,21 @@ const testimonials: Testimonial[] = [
     quote: "Xoire's AI transformed our operations, boosting efficiency by 40% and unlocking new revenue streams. Truly game-changing!",
     name: "Eva Rostova",
     company: "CEO, QuantumLeap Tech",
-    avatar: "https://placehold.co/100x100/7DF9FF/222222.png?text=ER",
+    avatar: "https://placehold.co/100x100/BF40BF/0A0A23.png?text=ER", // Purple accent
     aiHint: "woman portrait",
   },
   {
     quote: "The AI trading bot developed by Xoire has consistently outperformed market benchmarks. Their expertise is unparalleled.",
     name: "Marcus Chen",
     company: "Founder, Apex Capital",
-    avatar: "https://placehold.co/100x100/00FF80/222222.png?text=MC",
+    avatar: "https://placehold.co/100x100/A0A0D0/0A0A23.png?text=MC", // Silver accent
     aiHint: "man portrait",
   },
   {
     quote: "Our customer engagement skyrocketed after implementing Xoire's AI chatbot solution. Support costs are down, satisfaction is up.",
     name: "Lena Hernandez",
     company: "CMO, NovaRetail Group",
-    avatar: "https://placehold.co/100x100/FFFFFF/222222.png?text=LH",
+    avatar: "https://placehold.co/100x100/FFFFFF/0A0A23.png?text=LH", // Foreground accent
     aiHint: "woman face",
   },
 ];
@@ -49,7 +50,7 @@ const sectionVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] } }, // bouncy ease
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] } },
 };
 
 
@@ -79,7 +80,7 @@ export default function CaseStudiesSection() {
         >
           {stats.map((stat, index) => (
             <MotionDiv key={index} variants={itemVariants}>
-              <Card className="glassmorphic text-center p-6 hover:shadow-neon-accent transition-shadow duration-300">
+              <Card className="glassmorphic text-center p-6 hover:shadow-lg hover:shadow-accent/30 transition-shadow duration-300">
                 <stat.icon className={`w-12 h-12 ${stat.color} mx-auto mb-4`} strokeWidth={1.5}/>
                 <p className={`font-headline text-4xl ${stat.color} mb-2`}>{stat.value}</p>
                 <p className="text-muted-foreground">{stat.label}</p>
@@ -101,7 +102,7 @@ export default function CaseStudiesSection() {
               variants={itemVariants}
               whileHover={{ y: -10, transition: { type: "spring", stiffness: 300 } }}
             >
-              <Card className="glassmorphic h-full flex flex-col p-6 group neon-border-primary hover:shadow-neon-primary transition-all duration-300">
+              <Card className="glassmorphic h-full flex flex-col p-6 group border-primary/30 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
                 <CardContent className="pt-6 flex-grow">
                   <div className="flex items-center mb-4">
                     <Image
