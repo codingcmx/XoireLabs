@@ -1,7 +1,7 @@
 import type {Config} from 'tailwindcss';
 
 export default {
-  darkMode: ['class'],
+  darkMode: ['class'], // Kept for ShadCN components that might use it internally
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -11,7 +11,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        headline: ['Audiowide', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -88,11 +88,25 @@ export default {
             height: '0',
           },
         },
+        'pulse-glow': {
+          '0%, 100%': { opacity: '1', boxShadow: '0 0 5px hsl(var(--primary)), 0 0 10px hsl(var(--primary))' },
+          '50%': { opacity: '0.7', boxShadow: '0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary))' },
+        },
+        'neon-flicker': {
+          '0%, 100%': { opacity: '1', textShadow: 'var(--neon-primary-glow)' },
+          '50%': { opacity: '0.8', textShadow: '0 0 3px hsl(var(--primary)), 0 0 7px hsl(var(--primary))' },
+        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'pulse-glow': 'pulse-glow 2s infinite ease-in-out',
+        'neon-flicker': 'neon-flicker 1.5s infinite alternate',
       },
+      boxShadow: {
+        'neon-primary': 'var(--neon-primary-glow)',
+        'neon-accent': 'var(--neon-accent-glow)',
+      }
     },
   },
   plugins: [require('tailwindcss-animate')],

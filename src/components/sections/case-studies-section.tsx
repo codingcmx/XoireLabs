@@ -1,0 +1,134 @@
+"use client";
+import Image from 'next/image';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import MotionDiv from '@/components/motion/motion-div';
+import { Star, TrendingUp, Users } from 'lucide-react';
+
+interface Testimonial {
+  quote: string;
+  name: string;
+  company: string;
+  avatar: string;
+  aiHint: string;
+}
+
+const testimonials: Testimonial[] = [
+  {
+    quote: "Xoire's AI transformed our operations, boosting efficiency by 40% and unlocking new revenue streams. Truly game-changing!",
+    name: "Eva Rostova",
+    company: "CEO, QuantumLeap Tech",
+    avatar: "https://placehold.co/100x100/7DF9FF/222222.png?text=ER",
+    aiHint: "woman portrait",
+  },
+  {
+    quote: "The AI trading bot developed by Xoire has consistently outperformed market benchmarks. Their expertise is unparalleled.",
+    name: "Marcus Chen",
+    company: "Founder, Apex Capital",
+    avatar: "https://placehold.co/100x100/00FF80/222222.png?text=MC",
+    aiHint: "man portrait",
+  },
+  {
+    quote: "Our customer engagement skyrocketed after implementing Xoire's AI chatbot solution. Support costs are down, satisfaction is up.",
+    name: "Lena Hernandez",
+    company: "CMO, NovaRetail Group",
+    avatar: "https://placehold.co/100x100/FFFFFF/222222.png?text=LH",
+    aiHint: "woman face",
+  },
+];
+
+const stats = [
+    { value: "$7.4M+", label: "Automated Annually", icon: TrendingUp, color: "text-primary" },
+    { value: "98%", label: "Client Satisfaction", icon: Star, color: "text-accent" },
+    { value: "150+", label: "AI Systems Deployed", icon: Users, color: "text-primary" },
+];
+
+const sectionVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.2, duration: 0.5 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] } }, // bouncy ease
+};
+
+
+export default function CaseStudiesSection() {
+  return (
+    <section id="case-studies" className="py-20 md:py-32 bg-background">
+      <div className="container">
+        <MotionDiv 
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7 }}
+          className="text-center mb-16"
+        >
+          <h2 className="font-headline text-4xl md:text-5xl mb-4">Proven Results, Real Impact</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Don't just take our word for it. See how we've empowered businesses like yours to achieve extraordinary outcomes.
+          </p>
+        </MotionDiv>
+
+        <MotionDiv 
+          className="grid md:grid-cols-3 gap-8 mb-16"
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          {stats.map((stat, index) => (
+            <MotionDiv key={index} variants={itemVariants}>
+              <Card className="glassmorphic text-center p-6 hover:shadow-neon-accent transition-shadow duration-300">
+                <stat.icon className={`w-12 h-12 ${stat.color} mx-auto mb-4`} strokeWidth={1.5}/>
+                <p className={`font-headline text-4xl ${stat.color} mb-2`}>{stat.value}</p>
+                <p className="text-muted-foreground">{stat.label}</p>
+              </Card>
+            </MotionDiv>
+          ))}
+        </MotionDiv>
+
+        <MotionDiv 
+          className="grid md:grid-cols-1 lg:grid-cols-3 gap-8"
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+        >
+          {testimonials.map((testimonial, index) => (
+            <MotionDiv 
+              key={index} 
+              variants={itemVariants}
+              whileHover={{ y: -10, transition: { type: "spring", stiffness: 300 } }}
+            >
+              <Card className="glassmorphic h-full flex flex-col p-6 group neon-border-primary hover:shadow-neon-primary transition-all duration-300">
+                <CardContent className="pt-6 flex-grow">
+                  <div className="flex items-center mb-4">
+                    <Image
+                      src={testimonial.avatar}
+                      alt={testimonial.name}
+                      width={60}
+                      height={60}
+                      className="rounded-full mr-4 border-2 border-primary group-hover:animate-pulse"
+                      data-ai-hint={testimonial.aiHint}
+                    />
+                    <div>
+                      <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors">{testimonial.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground">{testimonial.company}</p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground italic">&quot;{testimonial.quote}&quot;</p>
+                </CardContent>
+                <div className="flex mt-4">
+                    {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-5 w-5 text-primary fill-primary" />
+                    ))}
+                </div>
+              </Card>
+            </MotionDiv>
+          ))}
+        </MotionDiv>
+      </div>
+    </section>
+  );
+}
