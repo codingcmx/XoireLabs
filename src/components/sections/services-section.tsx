@@ -2,7 +2,7 @@
 "use client";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import MotionDiv from '@/components/motion/motion-div';
-import { BrainCircuit, LineChart, ShieldCheck, Bot, Code2, ShoppingCart } from "lucide-react";
+import { BrainCircuit, LineChart, Users, Bot, Code2, SearchCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 interface Service {
@@ -23,14 +23,14 @@ const services: Service[] = [
     description: "Streamline workflows and optimize operations with intelligent automation solutions.",
   },
   {
-    icon: ShoppingCart,
-    title: "AI Marketing",
-    description: "Personalized campaigns, customer segmentation, and automated content generation.",
+    icon: SearchCheck, // Changed icon from ShoppingCart
+    title: "AI Lead Generation", // Changed title
+    description: "Discover, qualify, and engage high-potential leads with AI-driven precision.", // Changed description
   },
   {
-    icon: ShieldCheck,
-    title: "Cybersecurity AI",
-    description: "Proactive threat detection, anomaly identification, and robust security protocols.",
+    icon: Users, // Changed icon from ShieldCheck
+    title: "AI Marketing", // Kept, but changed icon to be more generic Users
+    description: "Personalized campaigns, customer segmentation, and automated content generation.",
   },
   {
     icon: Code2,

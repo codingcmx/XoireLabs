@@ -8,7 +8,7 @@ import { useScroll, useTransform, motion } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { generateImage, type GenerateImageInput } from '@/ai/flows/generate-image-flow';
 
-const ORIGINAL_ORB_IMAGE_URL = "https://placehold.co/400x400/6A0DAD/FFFFFF.png?text=AI+Orb"; // Purple orb
+const ORIGINAL_ORB_IMAGE_URL = "https://placehold.co/400x400/6A0DAD/FFFFFF.png?text=AI+Orb"; 
 const ORB_IMAGE_AI_HINT = "glowing sphere";
 
 export default function HeroSection() {
@@ -99,7 +99,7 @@ export default function HeroSection() {
             <span className="block text-primary">Rule with AI.</span>
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto">
-            Xoire delivers full-stack AI systems for trading, automation, marketing, security, coding, and chatbots. Transform your business into an intelligent powerhouse.
+            Xoire delivers full-stack AI systems for trading, automation, marketing, lead generation, coding, and chatbots. Transform your business into an intelligent powerhouse.
           </p>
         </MotionDiv>
         

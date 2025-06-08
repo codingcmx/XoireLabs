@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import MotionDiv from '@/components/motion/motion-div';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Eye, Zap } from 'lucide-react';
+import { Eye, Zap, Users } from 'lucide-react'; // Added Users for LeadSpark
 
 interface System {
   id: string;
@@ -24,7 +24,7 @@ const systems: System[] = [
     id: "tradetitan",
     name: "TradeTitan AI",
     description: "Automated high-frequency trading bot with adaptive learning algorithms.",
-    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=TradeTitan", // Dark bg, Purple text
+    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=TradeTitan", 
     aiHint: "trading graph",
     details: [
       { feature: "Real-time market analysis", benefit: "Maximizes profit opportunities 24/7." },
@@ -36,7 +36,7 @@ const systems: System[] = [
     id: "autonexus",
     name: "AutoNexus Flow",
     description: "Intelligent process automation for complex enterprise workflows.",
-    imageSrc: "https://placehold.co/600x400/0A0A23/A0A0D0.png?text=AutoNexus", // Dark bg, Silver text
+    imageSrc: "https://placehold.co/600x400/0A0A23/A0A0D0.png?text=AutoNexus", 
     aiHint: "flow chart",
     details: [
       { feature: "AI-driven decision making", benefit: "Optimizes operational efficiency." },
@@ -45,15 +45,15 @@ const systems: System[] = [
     ]
   },
   {
-    id: "securemind",
-    name: "SecureMind Sentinel",
-    description: "AI-powered cybersecurity shield with predictive threat intelligence.",
-    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=SecureMind", // Dark bg, Purple text
-    aiHint: "security shield",
+    id: "leadspark", // Changed from securemind
+    name: "LeadSpark AI", // Changed name
+    description: "AI-driven lead discovery, qualification, and engagement engine.", // Changed description
+    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=LeadSpark", // Changed text for placeholder
+    aiHint: "connections network", // Changed AI hint
     details: [
-      { feature: "Behavioral anomaly detection", benefit: "Identifies and neutralizes novel threats." },
-      { feature: "Automated incident response", benefit: "Contains breaches in real-time." },
-      { feature: "Continuous security posture assessment", benefit: "Ensures ongoing protection." },
+      { feature: "Targeted prospect identification", benefit: "Uncovers high-potential leads based on ideal customer profiles." },
+      { feature: "Automated outreach personalization", benefit: "Generates tailored messaging to increase engagement rates." },
+      { feature: "Lead scoring & prioritization", benefit: "Focuses sales efforts on the most promising opportunities for conversion." },
     ]
   },
 ];
