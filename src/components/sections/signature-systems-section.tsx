@@ -143,10 +143,13 @@ export default function SignatureSystemsSection() {
                       <div className="grid gap-6 py-4">
                         <div className="aspect-video bg-muted rounded-lg overflow-hidden border border-border">
                           <video
-                            controls
+                            autoPlay
+                            loop
+                            muted
+                            playsInline // Important for autoplay on mobile
                             poster={system.videoPosterUrl}
                             className="w-full h-full object-cover"
-                            preload="metadata"
+                            preload="auto" // Changed from metadata for better autoplay
                             data-ai-hint={system.aiHintVideo}
                           >
                             <source src={system.videoSrc} type="video/mp4" />
