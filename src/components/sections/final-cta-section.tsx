@@ -2,7 +2,9 @@
 "use client";
 import { Button } from '@/components/ui/button';
 import MotionDiv from '@/components/motion/motion-div';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Mail, MessageSquare } from 'lucide-react';
+import Link from 'next/link';
+import ContactForm from '@/components/common/contact-form'; // Import the ContactForm
 
 export default function FinalCtaSection() {
   return (
@@ -22,7 +24,7 @@ export default function FinalCtaSection() {
        <div className="absolute inset-0 z-0 bg-gradient-to-tr from-primary/10 via-transparent to-accent/10 opacity-30 animate-pulse"></div>
 
 
-      <div className="container relative z-10 text-center">
+      <div className="container relative z-10">
         <MotionDiv
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -30,17 +32,25 @@ export default function FinalCtaSection() {
           transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
           className="max-w-3xl mx-auto p-8 md:p-12 rounded-lg glassmorphic shadow-2xl border border-primary/40"
         >
-          <Sparkles className="w-16 h-16 text-primary mx-auto mb-6 animate-pulse" />
+          <Mail className="w-16 h-16 text-primary mx-auto mb-6 animate-pulse" />
           <h2 className="font-headline text-4xl md:text-5xl mb-6 text-primary">
-            Ready to Revolutionize Your Business?
+            Get in Touch & Start Your AI Journey
           </h2>
-          <p className="text-lg text-muted-foreground mb-10">
-            Let Xoire AI be your catalyst for transformation. Partner with us to unlock the full potential of artificial intelligence and redefine what's possible for your enterprise.
+          <p className="text-lg text-muted-foreground mb-8">
+            Have questions or ready to discuss your project? Fill out the form below or schedule a direct consultation. Let Xoire AI be your catalyst for transformation.
           </p>
-          <Button size="lg" className="text-xl px-10 py-7 group hover:bg-primary/80">
-            Start Your AI Journey Now
-            <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
-          </Button>
+          
+          <ContactForm />
+          
+          <div className="mt-10 text-center">
+            <p className="text-muted-foreground mb-4">Or, book a meeting directly:</p>
+            <Button size="lg" className="text-xl px-10 py-7 group hover:bg-primary/80" asChild>
+              <Link href="#book-meeting">
+                Schedule Consultation
+                <MessageSquare className="ml-3 h-6 w-6 group-hover:animate-pulse" />
+              </Link>
+            </Button>
+          </div>
         </MotionDiv>
       </div>
     </section>

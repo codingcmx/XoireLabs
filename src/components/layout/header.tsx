@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -6,10 +7,12 @@ import { Menu, BotMessageSquareIcon } from 'lucide-react';
 const navItems = [
   { label: 'Services', href: '#services' },
   { label: 'Systems', href: '#systems' },
+  { label: 'Demos', href: '#demos' },
   { label: 'Case Studies', href: '#case-studies' },
   { label: 'Industries', href: '#industries' },
   { label: 'Why Xoire', href: '#why-xoire' },
   { label: 'FAQs', href: '#faq' },
+  { label: 'Book Meeting', href: '#book-meeting' },
 ];
 
 export default function Header() {
@@ -35,7 +38,9 @@ export default function Header() {
 
         <div className="hidden md:flex items-center space-x-2">
             <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground">Login</Button>
-            <Button>Get Started</Button>
+            <Button asChild>
+              <Link href="#book-meeting">Get Started</Link>
+            </Button>
         </div>
 
         <div className="md:hidden">
@@ -49,17 +54,22 @@ export default function Header() {
             <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background">
               <nav className="flex flex-col space-y-4 pt-10">
                 {navItems.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="text-lg transition-colors hover:text-primary"
-                  >
-                    {item.label}
-                  </Link>
+                   <SheetTrigger asChild key={item.label}>
+                    <Link
+                      href={item.href}
+                      className="text-lg transition-colors hover:text-primary"
+                    >
+                      {item.label}
+                    </Link>
+                  </SheetTrigger>
                 ))}
                 <div className="flex flex-col space-y-2 pt-4">
                     <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground">Login</Button>
-                    <Button>Get Started</Button>
+                     <SheetTrigger asChild>
+                      <Button asChild>
+                        <Link href="#book-meeting">Get Started</Link>
+                      </Button>
+                    </SheetTrigger>
                 </div>
               </nav>
             </SheetContent>

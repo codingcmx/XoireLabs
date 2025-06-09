@@ -1,14 +1,18 @@
+
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import MobileCtaBar from '@/components/layout/mobile-cta-bar';
 import HeroSection from '@/components/sections/hero-section';
 import ServicesSection from '@/components/sections/services-section';
 import SignatureSystemsSection from '@/components/sections/signature-systems-section';
+import ProductDemosSection from '@/components/sections/product-demos-section';
 import CaseStudiesSection from '@/components/sections/case-studies-section';
 import IndustriesSection from '@/components/sections/industries-section';
 import WhyXoireSection from '@/components/sections/why-xoire-section';
 import FaqSection from '@/components/sections/faq-section';
+import BookMeetingSection from '@/components/sections/book-meeting-section';
 import FinalCtaSection from '@/components/sections/final-cta-section';
+
 
 export default function HomePage() {
   return (
@@ -18,10 +22,12 @@ export default function HomePage() {
         <HeroSection />
         <ServicesSection />
         <SignatureSystemsSection />
+        <ProductDemosSection />
         <CaseStudiesSection />
         <IndustriesSection />
         <WhyXoireSection />
         <FaqSection />
+        <BookMeetingSection />
         <FinalCtaSection />
       </main>
       <Footer />
