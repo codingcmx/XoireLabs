@@ -11,11 +11,11 @@ interface System {
   id: string;
   name: string;
   description: string;
-  imageSrc: string; // For the card preview
-  aiHintCard: string; // AI hint for the card preview image
+  imageSrc: string; // Fallback poster for card video if videoPosterUrl not available
+  aiHintCard: string; // AI hint for the card image/poster
   videoSrc: string; // Path to the video in public/videos
-  videoPosterUrl: string; // Poster for the video in the dialog
-  aiHintVideo: string; // AI hint for the video/poster in the dialog
+  videoPosterUrl: string; // Poster for the video on card & in dialog
+  aiHintVideo: string; // AI hint for the video
   details: {
     feature: string;
     benefit: string;
@@ -28,9 +28,9 @@ const systems: System[] = [
     name: "TradeTitan AI",
     description: "Automated high-frequency trading bot with adaptive learning algorithms.",
     imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=TradeTitan", 
-    aiHintCard: "trading graph",
+    aiHintCard: "trading graph", // Kept if needed as fallback
     videoSrc: "/videos/tradetitan-demo.mp4",
-    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/BF40BF.png?text=TradeTitan+Demo",
+    videoPosterUrl: "https://placehold.co/600x300/0A0A23/BF40BF.png?text=TradeTitan+Vid", // Adjusted aspect for card
     aiHintVideo: "financial graph animation",
     details: [
       { feature: "Real-time market analysis", benefit: "Maximizes profit opportunities 24/7." },
@@ -43,9 +43,9 @@ const systems: System[] = [
     name: "AutoNexus Flow",
     description: "Intelligent process automation for complex enterprise workflows.",
     imageSrc: "https://placehold.co/600x400/0A0A23/A0A0D0.png?text=AutoNexus", 
-    aiHintCard: "flow chart",
+    aiHintCard: "flow chart", // Kept if needed as fallback
     videoSrc: "/videos/autonexus-demo.mp4",
-    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/A0A0D0.png?text=AutoNexus+Demo",
+    videoPosterUrl: "https://placehold.co/600x300/0A0A23/A0A0D0.png?text=AutoNexus+Vid", // Adjusted aspect for card
     aiHintVideo: "process automation flowchart",
     details: [
       { feature: "AI-driven decision making", benefit: "Optimizes operational efficiency." },
@@ -58,9 +58,9 @@ const systems: System[] = [
     name: "LeadSpark AI", 
     description: "AI-driven lead discovery, qualification, and engagement engine.", 
     imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=LeadSpark", 
-    aiHintCard: "connections network", 
+    aiHintCard: "connections network", // Kept if needed as fallback
     videoSrc: "/videos/leadspark-demo.mp4",
-    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadSpark+Demo",
+    videoPosterUrl: "https://placehold.co/600x300/0A0A23/FFFFFF.png?text=LeadSpark+Vid", // Adjusted aspect for card
     aiHintVideo: "lead generation interface",
     details: [
       { feature: "Targeted prospect identification", benefit: "Uncovers high-potential leads based on ideal customer profiles." },
@@ -112,15 +112,20 @@ export default function SignatureSystemsSection() {
               className="h-full"
             >
               <Card className="glassmorphic group h-full flex flex-col overflow-hidden border-accent/30 hover:border-accent/70 transition-all duration-300 ease-out">
-                <CardHeader className="p-0">
-                  <Image
-                    src={system.imageSrc}
-                    alt={system.name}
-                    width={600}
-                    height={300}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    data-ai-hint={system.aiHintCard}
-                  />
+                <CardHeader className="p-0 relative aspect-[16/9] overflow-hidden"> {/* Adjusted aspect ratio for video */}
+                  <video
+                    src={system.videoSrc}
+                    poster={system.videoPosterUrl || system.imageSrc}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    data-ai-hint={system.aiHintVideo}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto" // Ensure video metadata loads for autoplay
+                  >
+                    Your browser does not support the video tag.
+                  </video>
                 </CardHeader>
                 <CardContent className="p-6 flex-grow">
                   <CardTitle className="text-2xl font-headline mb-2 group-hover:text-accent transition-colors">{system.name}</CardTitle>
@@ -146,11 +151,12 @@ export default function SignatureSystemsSection() {
                             autoPlay
                             loop
                             muted
-                            playsInline // Important for autoplay on mobile
+                            playsInline 
                             poster={system.videoPosterUrl}
                             className="w-full h-full object-cover"
-                            preload="auto" // Changed from metadata for better autoplay
+                            preload="auto" 
                             data-ai-hint={system.aiHintVideo}
+                            controls // Keep controls in dialog for user interaction
                           >
                             <source src={system.videoSrc} type="video/mp4" />
                             Your browser does not support the video tag.
@@ -182,3 +188,4 @@ export default function SignatureSystemsSection() {
     </section>
   );
 }
+
