@@ -7,16 +7,14 @@ import { ArrowRight, Zap, Star, MoveRight } from 'lucide-react';
 import { useScroll, useTransform, motion } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { generateImage, type GenerateImageInput } from '@/ai/flows/generate-image-flow';
-// import Link from 'next/link'; // Link might not be needed for CTAs if they trigger modal
+import Link from 'next/link'; // Import Link
 
 const ORIGINAL_ORB_IMAGE_URL = "https://placehold.co/800x800.png";
 const ORB_IMAGE_AI_HINT = "blue swirling galaxy planet";
 
-interface HeroSectionProps {
-  onTriggerBookingModal?: () => void;
-}
+// Removed HeroSectionProps interface as onTriggerBookingModal is no longer needed
 
-export default function HeroSection({ onTriggerBookingModal }: HeroSectionProps) {
+export default function HeroSection() { // Removed onTriggerBookingModal prop
   const targetRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -161,16 +159,17 @@ export default function HeroSection({ onTriggerBookingModal }: HeroSectionProps)
             animate={{ opacity: 1, y: 0, transition: { duration: 0.8, delay: 1.2, ease: "easeOut" } }}
             className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
           >
-            <Button size="lg" className="text-lg px-8 py-6 group btn-ripple hover:shadow-primary/40 shadow-lg" onClick={onTriggerBookingModal}>
+            <Button size="lg" className="text-lg px-8 py-6 group btn-ripple hover:shadow-primary/40 shadow-lg" asChild>
+              <Link href="/book-meeting">
                 Launch Your Elite AI Project
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
-            {/* Assuming this button also opens a demo or other link, if not, it could also trigger booking modal */}
             <Button variant="outline" size="lg" className="text-lg px-8 py-6 group border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary btn-portal-spark" asChild>
-              <a href="#demos"> {/* Or Link component from Next.js if preferred */}
+              <Link href="/#demos">
                 Enter the AI Dimension Now
                 <MoveRight className="ml-2 h-5 w-5 group-hover:animate-pulse" />
-              </a>
+              </Link>
             </Button>
           </MotionDiv>
         </motion.div>

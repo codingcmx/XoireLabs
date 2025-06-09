@@ -6,21 +6,19 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/s
 import { Menu, BotMessageSquareIcon } from 'lucide-react';
 
 const navItemsBase = [
-  { label: 'Services', href: '#services' },
-  { label: 'Systems', href: '#systems' },
-  { label: 'Demos', href: '#demos' },
-  { label: 'Case Studies', href: '#case-studies' },
-  { label: 'Industries', href: '#industries' },
-  { label: 'Why Xoire', href: '#why-xoire' },
-  { label: 'FAQs', href: '#faq' },
-  // 'Book Meeting' is now a trigger, not a link
+  { label: 'Services', href: '/#services' }, // Ensure homepage links work from other pages
+  { label: 'Systems', href: '/#systems' },
+  { label: 'Demos', href: '/#demos' },
+  { label: 'Case Studies', href: '/#case-studies' },
+  { label: 'Industries', href: '/#industries' },
+  { label: 'Why Xoire', href: '/#why-xoire' },
+  { label: 'FAQs', href: '/#faq' },
+  { label: 'Book Meeting', href: '/book-meeting' }, // Changed to direct link
 ];
 
-interface HeaderProps {
-  onTriggerBookingModal?: () => void;
-}
+// Removed HeaderProps interface as onTriggerBookingModal is no longer needed
 
-export default function Header({ onTriggerBookingModal }: HeaderProps) {
+export default function Header() { // Removed onTriggerBookingModal prop
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
@@ -39,21 +37,13 @@ export default function Header({ onTriggerBookingModal }: HeaderProps) {
               {item.label}
             </Link>
           ))}
-          {onTriggerBookingModal && (
-            <button
-              onClick={onTriggerBookingModal}
-              className="transition-colors hover:text-primary text-sm font-medium"
-            >
-              Book Meeting
-            </button>
-          )}
         </nav>
 
         <div className="hidden md:flex items-center space-x-2">
             <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground">Login</Button>
-            {onTriggerBookingModal && (
-              <Button onClick={onTriggerBookingModal}>Get Started</Button>
-            )}
+            <Button asChild>
+              <Link href="/book-meeting">Get Started</Link>
+            </Button>
         </div>
 
         <div className="md:hidden">
@@ -76,23 +66,13 @@ export default function Header({ onTriggerBookingModal }: HeaderProps) {
                     </Link>
                   </SheetClose>
                 ))}
-                 {onTriggerBookingModal && (
-                  <SheetClose asChild>
-                    <button
-                      onClick={onTriggerBookingModal}
-                      className="text-lg transition-colors hover:text-primary text-left"
-                    >
-                      Book Meeting
-                    </button>
-                  </SheetClose>
-                )}
                 <div className="flex flex-col space-y-2 pt-4">
                     <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground w-full">Login</Button>
-                    {onTriggerBookingModal && (
-                      <SheetClose asChild>
-                        <Button onClick={onTriggerBookingModal} className="w-full">Get Started</Button>
-                      </SheetClose>
-                    )}
+                    <SheetClose asChild>
+                      <Button asChild className="w-full">
+                        <Link href="/book-meeting">Get Started</Link>
+                      </Button>
+                    </SheetClose>
                 </div>
               </nav>
             </SheetContent>
