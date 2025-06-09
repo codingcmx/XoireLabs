@@ -7,10 +7,10 @@ import MobileCtaBar from '@/components/layout/mobile-cta-bar';
 import HeroSection from '@/components/sections/hero-section';
 import ServicesSection from '@/components/sections/services-section';
 import SignatureSystemsSection from '@/components/sections/signature-systems-section';
-// import ProductDemosSection from '@/components/sections/product-demos-section'; // Removed
+// Removed ProductDemosSection import
 import CaseStudiesSection from '@/components/sections/case-studies-section';
 import IndustriesSection from '@/components/sections/industries-section';
-import WhyXoireSection from '@/components/sections/why-xoire-section';
+// import WhyXoireSection from '@/components/sections/why-xoire-section'; // Removed
 import FaqSection from '@/components/sections/faq-section';
 import FinalCtaSection from '@/components/sections/final-cta-section';
 // Removed Dialog imports
@@ -27,10 +27,10 @@ export default function HomePage() {
         <HeroSection /> {/* Removed onTriggerBookingModal prop */}
         <ServicesSection />
         <SignatureSystemsSection />
-        {/* <ProductDemosSection /> */} {/* Removed */}
+        {/* ProductDemosSection removed */}
         <CaseStudiesSection />
         <IndustriesSection />
-        <WhyXoireSection />
+        {/* WhyXoireSection removed */}
         <FaqSection />
         <FinalCtaSection /> {/* Removed onTriggerBookingModal prop */}
       </main>

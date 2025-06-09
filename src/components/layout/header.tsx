@@ -8,10 +8,10 @@ import { Menu, BotMessageSquareIcon } from 'lucide-react';
 const navItemsBase = [
   { label: 'Services', href: '/#services' }, 
   { label: 'Systems', href: '/#systems' },
-  { label: 'Demos', href: '/demos' }, // Updated link
+  { label: 'Demos', href: '/demos' }, 
   { label: 'Case Studies', href: '/#case-studies' },
   { label: 'Industries', href: '/#industries' },
-  { label: 'Why Xoire', href: '/#why-xoire' },
+  { label: 'Why Xoire', href: '/why-xoire' }, // Updated link
   { label: 'FAQs', href: '/#faq' },
   { label: 'Book Meeting', href: '/book-meeting' }, 
 ];

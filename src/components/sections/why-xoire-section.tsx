@@ -1,7 +1,7 @@
 
 "use client";
 import MotionDiv from '@/components/motion/motion-div';
-import { CheckCircle, Zap, Target, Brain, Users } from 'lucide-react';
+import { Zap, Target, Brain, Users as UsersIcon } from 'lucide-react'; // Renamed Users to UsersIcon to avoid conflict
 import Image from 'next/image';
 
 const reasons = [
@@ -21,7 +21,7 @@ const reasons = [
     text: "Leverage our agile methodologies and pre-built components for faster time-to-market and quicker ROI.",
   },
   {
-    icon: Users,
+    icon: UsersIcon, // Updated to UsersIcon
     title: "Partnership Approach",
     text: "We work collaboratively with you, ensuring our AI solutions align perfectly with your unique goals.",
   },
@@ -37,22 +37,28 @@ const itemVariants = {
   visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-export default function WhyXoireSection() {
+interface WhyXoireContentProps {
+  isPageContent?: boolean; // To conditionally render heading if it's a page
+}
+
+export default function WhyXoireContent({ isPageContent = false }: WhyXoireContentProps) {
   return (
-    <section id="why-xoire" className="py-20 md:py-32 bg-background">
-      <div className="container">
-        <MotionDiv 
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-16"
-        >
-          <h2 className="font-headline text-4xl md:text-5xl mb-4">Why Partner with Xoire?</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose Xoire to unlock unparalleled AI capabilities, drive innovation, and secure a competitive edge in your industry.
-          </p>
-        </MotionDiv>
+    <section id="why-xoire" className={isPageContent ? "" : "py-20 md:py-32 bg-background"}>
+      <div className={isPageContent ? "" : "container"}>
+        {!isPageContent && (
+          <MotionDiv 
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-16"
+          >
+            <h2 className="font-headline text-4xl md:text-5xl mb-4">Why Partner with Xoire?</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Choose Xoire to unlock unparalleled AI capabilities, drive innovation, and secure a competitive edge in your industry.
+            </p>
+          </MotionDiv>
+        )}
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <MotionDiv
@@ -60,6 +66,7 @@ export default function WhyXoireSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.8 }}
+            className="order-last md:order-first" // Ensure image is first on mobile then left on desktop
           >
             <Image 
               src="https://placehold.co/600x500/0A0A23/BF40BF.png?text=Abstract+AI" 
