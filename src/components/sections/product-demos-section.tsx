@@ -8,25 +8,28 @@ const demos = [
   {
     id: "demo-tradetitan",
     title: "TradeTitan AI In Action",
-    description: "See how TradeTitan AI analyzes markets and executes trades in real-time. (Placeholder for video embed)",
+    description: "See how TradeTitan AI analyzes markets and executes trades in real-time.",
     icon: BarChart3,
-    videoPlaceholderUrl: "https://placehold.co/1600x900/0A0A23/BF40BF.png?text=TradeTitan+Demo",
+    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/BF40BF.png?text=TradeTitan+Demo",
+    videoSrc: "/videos/tradetitan-demo.mp4", // Example path, replace with your actual video file
     aiHint: "financial graph animation"
   },
   {
     id: "demo-autonexus",
     title: "AutoNexus Workflow Automation",
-    description: "Watch AutoNexus streamline a complex business process from start to finish. (Placeholder for video embed)",
-    icon: PlayCircle, // Using PlayCircle for a general demo
-    videoPlaceholderUrl: "https://placehold.co/1600x900/0A0A23/A0A0D0.png?text=AutoNexus+Demo",
+    description: "Watch AutoNexus streamline a complex business process from start to finish.",
+    icon: PlayCircle,
+    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/A0A0D0.png?text=AutoNexus+Demo",
+    videoSrc: "/videos/autonexus-demo.mp4", // Example path, replace with your actual video file
     aiHint: "process automation flowchart"
   },
   {
     id: "demo-leadspark",
     title: "LeadSpark AI Lead Gen Demo",
-    description: "Discover how LeadSpark AI identifies and qualifies high-potential leads. (Placeholder for video embed)",
-    icon: Bot, // Or Users, Search
-    videoPlaceholderUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadSpark+Demo",
+    description: "Discover how LeadSpark AI identifies and qualifies high-potential leads.",
+    icon: Bot,
+    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadSpark+Demo",
+    videoSrc: "/videos/leadspark-demo.mp4", // Example path, replace with your actual video file
     aiHint: "lead generation interface"
   },
 ];
@@ -46,7 +49,7 @@ export default function ProductDemosSection() {
   return (
     <section id="demos" className="py-20 md:py-32 bg-gradient-to-b from-indigo-900/20 to-background">
       <div className="container">
-        <MotionDiv 
+        <MotionDiv
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
@@ -59,8 +62,8 @@ export default function ProductDemosSection() {
           </p>
         </MotionDiv>
 
-        <MotionDiv 
-          className="grid md:grid-cols-1 lg:grid-cols-1 gap-12" // Changed to single column for larger demo displays
+        <MotionDiv
+          className="grid md:grid-cols-1 lg:grid-cols-1 gap-12"
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
@@ -80,16 +83,21 @@ export default function ProductDemosSection() {
                 </CardHeader>
                 <CardContent className="p-6 pt-0">
                   <div className="aspect-video bg-muted rounded-lg overflow-hidden border border-border">
-                    {/* In a real app, replace this div with an iframe for YouTube/Vimeo or a video player */}
-                    <img 
-                        src={demo.videoPlaceholderUrl} 
-                        alt={`${demo.title} placeholder`} 
+                    <video
+                        controls
+                        poster={demo.videoPosterUrl}
                         className="w-full h-full object-cover"
-                        data-ai-hint={demo.aiHint}
-                    />
+                        preload="metadata" // Good for performance, loads only metadata
+                        data-ai-hint={demo.aiHint} // Keep hint for poster if needed
+                    >
+                        <source src={demo.videoSrc} type="video/mp4" />
+                        {/* Add other source types if you have them, e.g., webm, ogg */}
+                        {/* <source src={demo.videoSrc.replace('.mp4', '.webm')} type="video/webm" /> */}
+                        Your browser does not support the video tag.
+                    </video>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Note: This is a placeholder. Embed your actual demo video here.
+                    Remember to place your video file at: public{demo.videoSrc}
                   </p>
                 </CardContent>
               </Card>
