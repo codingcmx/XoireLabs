@@ -1,10 +1,11 @@
 
+"use client";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Menu, BotMessageSquareIcon } from 'lucide-react';
 
-const navItems = [
+const navItemsBase = [
   { label: 'Services', href: '#services' },
   { label: 'Systems', href: '#systems' },
   { label: 'Demos', href: '#demos' },
@@ -12,10 +13,14 @@ const navItems = [
   { label: 'Industries', href: '#industries' },
   { label: 'Why Xoire', href: '#why-xoire' },
   { label: 'FAQs', href: '#faq' },
-  { label: 'Book Meeting', href: '#book-meeting' },
+  // 'Book Meeting' is now a trigger, not a link
 ];
 
-export default function Header() {
+interface HeaderProps {
+  onTriggerBookingModal?: () => void;
+}
+
+export default function Header({ onTriggerBookingModal }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
@@ -25,7 +30,7 @@ export default function Header() {
         </Link>
         
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          {navItems.map((item) => (
+          {navItemsBase.map((item) => (
             <Link
               key={item.label}
               href={item.href}
@@ -34,13 +39,21 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
+          {onTriggerBookingModal && (
+            <button
+              onClick={onTriggerBookingModal}
+              className="transition-colors hover:text-primary text-sm font-medium"
+            >
+              Book Meeting
+            </button>
+          )}
         </nav>
 
         <div className="hidden md:flex items-center space-x-2">
             <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground">Login</Button>
-            <Button asChild>
-              <Link href="#book-meeting">Get Started</Link>
-            </Button>
+            {onTriggerBookingModal && (
+              <Button onClick={onTriggerBookingModal}>Get Started</Button>
+            )}
         </div>
 
         <div className="md:hidden">
@@ -53,23 +66,33 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background">
               <nav className="flex flex-col space-y-4 pt-10">
-                {navItems.map((item) => (
-                   <SheetTrigger asChild key={item.label}>
+                {navItemsBase.map((item) => (
+                   <SheetClose asChild key={item.label}>
                     <Link
                       href={item.href}
                       className="text-lg transition-colors hover:text-primary"
                     >
                       {item.label}
                     </Link>
-                  </SheetTrigger>
+                  </SheetClose>
                 ))}
+                 {onTriggerBookingModal && (
+                  <SheetClose asChild>
+                    <button
+                      onClick={onTriggerBookingModal}
+                      className="text-lg transition-colors hover:text-primary text-left"
+                    >
+                      Book Meeting
+                    </button>
+                  </SheetClose>
+                )}
                 <div className="flex flex-col space-y-2 pt-4">
-                    <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground">Login</Button>
-                     <SheetTrigger asChild>
-                      <Button asChild>
-                        <Link href="#book-meeting">Get Started</Link>
-                      </Button>
-                    </SheetTrigger>
+                    <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground w-full">Login</Button>
+                    {onTriggerBookingModal && (
+                      <SheetClose asChild>
+                        <Button onClick={onTriggerBookingModal} className="w-full">Get Started</Button>
+                      </SheetClose>
+                    )}
                 </div>
               </nav>
             </SheetContent>

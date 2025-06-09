@@ -7,12 +7,16 @@ import { ArrowRight, Zap, Star, MoveRight } from 'lucide-react';
 import { useScroll, useTransform, motion } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { generateImage, type GenerateImageInput } from '@/ai/flows/generate-image-flow';
-import Link from 'next/link';
+// import Link from 'next/link'; // Link might not be needed for CTAs if they trigger modal
 
-const ORIGINAL_ORB_IMAGE_URL = "https://placehold.co/800x800/0D0D2B/8A2BE2.png?text=AI";
+const ORIGINAL_ORB_IMAGE_URL = "https://placehold.co/800x800.png";
 const ORB_IMAGE_AI_HINT = "blue swirling galaxy planet";
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  onTriggerBookingModal?: () => void;
+}
+
+export default function HeroSection({ onTriggerBookingModal }: HeroSectionProps) {
   const targetRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -157,17 +161,16 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0, transition: { duration: 0.8, delay: 1.2, ease: "easeOut" } }}
             className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
           >
-            <Button size="lg" className="text-lg px-8 py-6 group btn-ripple hover:shadow-primary/40 shadow-lg" asChild>
-              <Link href="#book-meeting">
+            <Button size="lg" className="text-lg px-8 py-6 group btn-ripple hover:shadow-primary/40 shadow-lg" onClick={onTriggerBookingModal}>
                 Launch Your Elite AI Project
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
             </Button>
+            {/* Assuming this button also opens a demo or other link, if not, it could also trigger booking modal */}
             <Button variant="outline" size="lg" className="text-lg px-8 py-6 group border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary btn-portal-spark" asChild>
-              <Link href="#demos">
+              <a href="#demos"> {/* Or Link component from Next.js if preferred */}
                 Enter the AI Dimension Now
                 <MoveRight className="ml-2 h-5 w-5 group-hover:animate-pulse" />
-              </Link>
+              </a>
             </Button>
           </MotionDiv>
         </motion.div>
@@ -179,7 +182,6 @@ export default function HeroSection() {
           initial="initial"
           animate="animate"
           whileHover={{ rotateY: 5, rotateX: -2, transition: { duration: 0.3 } }}
-          
         >
           <motion.div 
             className="relative w-[300px] h-[300px] md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px]"

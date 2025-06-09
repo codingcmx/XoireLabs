@@ -3,10 +3,14 @@
 import { Button } from '@/components/ui/button';
 import MotionDiv from '@/components/motion/motion-div';
 import { ArrowRight, Sparkles, Mail, MessageSquare } from 'lucide-react';
-import Link from 'next/link';
-import ContactForm from '@/components/common/contact-form'; // Import the ContactForm
+// import Link from 'next/link'; // No longer using Link for the button
+import ContactForm from '@/components/common/contact-form';
 
-export default function FinalCtaSection() {
+interface FinalCtaSectionProps {
+  onTriggerBookingModal?: () => void;
+}
+
+export default function FinalCtaSection({ onTriggerBookingModal }: FinalCtaSectionProps) {
   return (
     <section id="contact" className="py-20 md:py-32 bg-background relative overflow-hidden">
       <div className="absolute inset-0 z-0 opacity-20">
@@ -44,11 +48,9 @@ export default function FinalCtaSection() {
           
           <div className="mt-10 text-center">
             <p className="text-muted-foreground mb-4">Or, book a meeting directly:</p>
-            <Button size="lg" className="text-xl px-10 py-7 group hover:bg-primary/80" asChild>
-              <Link href="#book-meeting">
+            <Button size="lg" className="text-xl px-10 py-7 group hover:bg-primary/80" onClick={onTriggerBookingModal}>
                 Schedule Consultation
                 <MessageSquare className="ml-3 h-6 w-6 group-hover:animate-pulse" />
-              </Link>
             </Button>
           </div>
         </MotionDiv>
