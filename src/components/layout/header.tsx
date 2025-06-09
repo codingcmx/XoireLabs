@@ -6,19 +6,17 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/s
 import { Menu, BotMessageSquareIcon } from 'lucide-react';
 
 const navItemsBase = [
-  { label: 'Services', href: '/#services' }, // Ensure homepage links work from other pages
+  { label: 'Services', href: '/#services' }, 
   { label: 'Systems', href: '/#systems' },
-  { label: 'Demos', href: '/#demos' },
+  { label: 'Demos', href: '/demos' }, // Updated link
   { label: 'Case Studies', href: '/#case-studies' },
   { label: 'Industries', href: '/#industries' },
   { label: 'Why Xoire', href: '/#why-xoire' },
   { label: 'FAQs', href: '/#faq' },
-  { label: 'Book Meeting', href: '/book-meeting' }, // Changed to direct link
+  { label: 'Book Meeting', href: '/book-meeting' }, 
 ];
 
-// Removed HeaderProps interface as onTriggerBookingModal is no longer needed
-
-export default function Header() { // Removed onTriggerBookingModal prop
+export default function Header() { 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between">

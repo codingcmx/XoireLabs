@@ -7,14 +7,13 @@ import { ArrowRight, Zap, Star, MoveRight } from 'lucide-react';
 import { useScroll, useTransform, motion } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { generateImage, type GenerateImageInput } from '@/ai/flows/generate-image-flow';
-import Link from 'next/link'; // Import Link
+import Link from 'next/link'; 
 
 const ORIGINAL_ORB_IMAGE_URL = "https://placehold.co/800x800.png";
 const ORB_IMAGE_AI_HINT = "blue swirling galaxy planet";
 
-// Removed HeroSectionProps interface as onTriggerBookingModal is no longer needed
 
-export default function HeroSection() { // Removed onTriggerBookingModal prop
+export default function HeroSection() { 
   const targetRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -166,7 +165,7 @@ export default function HeroSection() { // Removed onTriggerBookingModal prop
               </Link>
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-6 group border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary btn-portal-spark" asChild>
-              <Link href="/#demos">
+              <Link href="/demos"> {/* Updated link */}
                 Enter the AI Dimension Now
                 <MoveRight className="ml-2 h-5 w-5 group-hover:animate-pulse" />
               </Link>

@@ -11,8 +11,11 @@ interface System {
   id: string;
   name: string;
   description: string;
-  imageSrc: string;
-  aiHint: string;
+  imageSrc: string; // For the card preview
+  aiHintCard: string; // AI hint for the card preview image
+  videoSrc: string; // Path to the video in public/videos
+  videoPosterUrl: string; // Poster for the video in the dialog
+  aiHintVideo: string; // AI hint for the video/poster in the dialog
   details: {
     feature: string;
     benefit: string;
@@ -25,7 +28,10 @@ const systems: System[] = [
     name: "TradeTitan AI",
     description: "Automated high-frequency trading bot with adaptive learning algorithms.",
     imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=TradeTitan", 
-    aiHint: "trading graph",
+    aiHintCard: "trading graph",
+    videoSrc: "/videos/tradetitan-demo.mp4",
+    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/BF40BF.png?text=TradeTitan+Demo",
+    aiHintVideo: "financial graph animation",
     details: [
       { feature: "Real-time market analysis", benefit: "Maximizes profit opportunities 24/7." },
       { feature: "Risk management protocols", benefit: "Minimizes potential losses intelligently." },
@@ -37,7 +43,10 @@ const systems: System[] = [
     name: "AutoNexus Flow",
     description: "Intelligent process automation for complex enterprise workflows.",
     imageSrc: "https://placehold.co/600x400/0A0A23/A0A0D0.png?text=AutoNexus", 
-    aiHint: "flow chart",
+    aiHintCard: "flow chart",
+    videoSrc: "/videos/autonexus-demo.mp4",
+    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/A0A0D0.png?text=AutoNexus+Demo",
+    aiHintVideo: "process automation flowchart",
     details: [
       { feature: "AI-driven decision making", benefit: "Optimizes operational efficiency." },
       { feature: "Seamless system integration", benefit: "Connects disparate software and platforms." },
@@ -45,11 +54,14 @@ const systems: System[] = [
     ]
   },
   {
-    id: "leadspark", // Changed from securemind
-    name: "LeadSpark AI", // Changed name
-    description: "AI-driven lead discovery, qualification, and engagement engine.", // Changed description
-    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=LeadSpark", // Changed text for placeholder
-    aiHint: "connections network", // Changed AI hint
+    id: "leadspark", 
+    name: "LeadSpark AI", 
+    description: "AI-driven lead discovery, qualification, and engagement engine.", 
+    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=LeadSpark", 
+    aiHintCard: "connections network", 
+    videoSrc: "/videos/leadspark-demo.mp4",
+    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadSpark+Demo",
+    aiHintVideo: "lead generation interface",
     details: [
       { feature: "Targeted prospect identification", benefit: "Uncovers high-potential leads based on ideal customer profiles." },
       { feature: "Automated outreach personalization", benefit: "Generates tailored messaging to increase engagement rates." },
@@ -93,8 +105,13 @@ export default function SignatureSystemsSection() {
           viewport={{ once: true, amount: 0.1 }}
         >
           {systems.map((system) => (
-            <MotionDiv key={system.id} variants={itemVariants}>
-              <Card className="glassmorphic group h-full flex flex-col overflow-hidden border-accent/30 hover:shadow-lg hover:shadow-accent/20 transition-all duration-300 ease-out">
+            <MotionDiv 
+              key={system.id} 
+              variants={itemVariants}
+              whileHover={{ scale: 1.03, y: -5, boxShadow: "0 10px 20px hsl(var(--accent)/0.15), 0 3px 6px hsl(var(--accent)/0.1)" }}
+              className="h-full"
+            >
+              <Card className="glassmorphic group h-full flex flex-col overflow-hidden border-accent/30 hover:border-accent/70 transition-all duration-300 ease-out">
                 <CardHeader className="p-0">
                   <Image
                     src={system.imageSrc}
@@ -102,7 +119,7 @@ export default function SignatureSystemsSection() {
                     width={600}
                     height={300}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    data-ai-hint={system.aiHint}
+                    data-ai-hint={system.aiHintCard}
                   />
                 </CardHeader>
                 <CardContent className="p-6 flex-grow">
@@ -113,36 +130,43 @@ export default function SignatureSystemsSection() {
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" className="w-full group/button border-primary/50 hover:bg-primary/10 hover:text-primary hover:shadow-md hover:shadow-primary/30">
-                        <Eye className="mr-2 h-4 w-4 group-hover/button:animate-pulse" /> Launch System Demo
+                        <Eye className="mr-2 h-4 w-4 group-hover/button:animate-pulse" /> View System Details & Demo
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[625px] glassmorphic border-primary/50">
+                    <DialogContent className="sm:max-w-2xl md:max-w-3xl glassmorphic border-primary/50">
                       <DialogHeader>
                         <DialogTitle className="font-headline text-3xl text-primary">{system.name}</DialogTitle>
                         <DialogDescription className="text-muted-foreground">
-                          {system.description} Dive deeper into the capabilities.
+                          {system.description} Watch the demo and explore key features below.
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <Image 
-                          src={system.imageSrc.replace("400","800x500")} 
-                          alt={`${system.name} Detail`} 
-                          width={800} 
-                          height={500} 
-                          className="rounded-md object-cover"
-                          data-ai-hint={system.aiHint}
-                        />
-                        <ul className="space-y-2 text-sm">
-                          {system.details.map(detail => (
-                            <li key={detail.feature} className="flex items-start">
-                              <Zap className="h-4 w-4 text-primary mr-2 mt-1 shrink-0" />
-                              <div>
-                                <strong className="text-foreground">{detail.feature}:</strong>
-                                <span className="text-muted-foreground ml-1">{detail.benefit}</span>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
+                      <div className="grid gap-6 py-4">
+                        <div className="aspect-video bg-muted rounded-lg overflow-hidden border border-border">
+                          <video
+                            controls
+                            poster={system.videoPosterUrl}
+                            className="w-full h-full object-cover"
+                            preload="metadata"
+                            data-ai-hint={system.aiHintVideo}
+                          >
+                            <source src={system.videoSrc} type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-semibold mb-2 text-foreground">Key Features & Benefits:</h4>
+                          <ul className="space-y-2 text-sm">
+                            {system.details.map(detail => (
+                              <li key={detail.feature} className="flex items-start">
+                                <Zap className="h-4 w-4 text-primary mr-2 mt-1 shrink-0" />
+                                <div>
+                                  <strong className="text-foreground">{detail.feature}:</strong>
+                                  <span className="text-muted-foreground ml-1">{detail.benefit}</span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
                     </DialogContent>
                   </Dialog>
