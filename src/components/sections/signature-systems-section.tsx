@@ -60,7 +60,7 @@ const systems: System[] = [
     imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=LeadSpark", 
     aiHintCard: "connections network", // Kept if needed as fallback
     videoSrc: "/videos/leadspark-demo.mp4",
-    videoPosterUrl: "https://placehold.co/600x300/0A0A23/FFFFFF.png?text=LeadSpark+Vid", // Adjusted aspect for card
+    videoPosterUrl: "https://placehold.co/600x300/0A0A23/FFFFFF.png?text=LeadGen", // Updated text
     aiHintVideo: "lead generation interface",
     details: [
       { feature: "Targeted prospect identification", benefit: "Uncovers high-potential leads based on ideal customer profiles." },

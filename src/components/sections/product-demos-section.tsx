@@ -28,7 +28,7 @@ const demos = [
     title: "LeadSpark AI Lead Gen Demo",
     description: "Discover how LeadSpark AI identifies and qualifies high-potential leads.",
     icon: Bot,
-    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadSpark+Demo",
+    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadGen+Demo", // Updated text
     videoSrc: "/videos/leadspark-demo.mp4", // Example path, replace with your actual video file
     aiHint: "lead generation interface"
   },
@@ -108,3 +108,4 @@ export default function ProductDemosSection() {
     </section>
   );
 }
+
