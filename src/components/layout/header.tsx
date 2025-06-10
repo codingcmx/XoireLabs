@@ -6,12 +6,13 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/s
 import { Menu, BotMessageSquareIcon } from 'lucide-react';
 
 const navItemsBase = [
+  { label: 'Home', href: '/' },
   { label: 'Services', href: '/#services' }, 
   { label: 'Systems', href: '/#systems' },
   { label: 'Demos', href: '/demos' }, 
   { label: 'Case Studies', href: '/#case-studies' },
   { label: 'Industries', href: '/#industries' },
-  { label: 'Why Xoire', href: '/why-xoire' }, // Updated link
+  { label: 'Why Xoire', href: '/why-xoire' }, 
   { label: 'FAQs', href: '/#faq' },
   { label: 'Book Meeting', href: '/book-meeting' }, 
 ];
@@ -38,7 +39,7 @@ export default function Header() {
         </nav>
 
         <div className="hidden md:flex items-center space-x-2">
-            <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground">Login</Button>
+            {/* Login button removed */}
             <Button asChild>
               <Link href="/book-meeting">Get Started</Link>
             </Button>
@@ -65,7 +66,7 @@ export default function Header() {
                   </SheetClose>
                 ))}
                 <div className="flex flex-col space-y-2 pt-4">
-                    <Button variant="outline" className="border-accent hover:bg-accent/10 hover:text-accent-foreground w-full">Login</Button>
+                    {/* Login button removed */}
                     <SheetClose asChild>
                       <Button asChild className="w-full">
                         <Link href="/book-meeting">Get Started</Link>
