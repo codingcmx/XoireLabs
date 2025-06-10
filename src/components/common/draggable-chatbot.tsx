@@ -20,8 +20,8 @@ const DraggableChatbot = () => {
   useEffect(() => {
     if (typeof window !== 'undefined' && chatbotRef.current) {
       // Ensure the element has rendered to get its dimensions for initial positioning
-      const elemWidth = chatbotRef.current.offsetWidth || 300; // Default width if not rendered
-      const elemHeight = chatbotRef.current.offsetHeight || 400; // Default height if not rendered
+      const elemWidth = chatbotRef.current.offsetWidth || 320; // Default width
+      const elemHeight = chatbotRef.current.offsetHeight || 450; // Default height
       
       const initialX = window.innerWidth - elemWidth - 20; // 20px padding from right
       const initialY = window.innerHeight - elemHeight - 20; // 20px padding from bottom
@@ -80,8 +80,6 @@ const DraggableChatbot = () => {
     };
   }, [dragging, offset]);
 
-  // Render with opacity 0 until initial position is set to avoid flash at (0,0)
-  // or use visibility hidden.
   const initialStyle = !isInitialised ? { opacity: 0, pointerEvents: 'none' as 'none' } : {};
 
   return (
@@ -106,18 +104,13 @@ const DraggableChatbot = () => {
         <h3 className="font-semibold text-lg">AI Assistant</h3>
         <BotMessageSquare className="w-6 h-6" />
       </div>
-      <div 
-        className="p-4 h-[calc(100%-3rem)] bg-background flex flex-col items-center justify-center text-muted-foreground"
-        data-ai-hint="chatbot embed area"
-      >
-        <BotMessageSquare className="w-16 h-16 text-primary/50 mb-4" />
-        <p className="text-center text-sm font-medium">
-          Your AI Chatbot Embed Area
-        </p>
-        <p className="text-xs text-center mt-1">
-          This container is draggable. Replace this content with your chatbot iframe or component.
-        </p>
-      </div>
+      <iframe
+        src="https://xoire-s-vision.vercel.app"
+        title="Xoire AI Chatbot"
+        className="w-full border-0"
+        style={{ height: 'calc(100% - 3rem)' }} // 3rem is the height of the header
+        allow="microphone; camera" // Optional, for potential chatbot features
+      ></iframe>
     </div>
   );
 };
