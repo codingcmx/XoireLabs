@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import MotionDiv from '@/components/motion/motion-div';
 import { Star, TrendingUp, Users } from 'lucide-react';
-import { useState, useEffect } from 'react'; // Added useState and useEffect
+// Removed useState and useEffect for previous rotation logic
 
 interface Testimonial {
   quote: string;
@@ -14,30 +14,46 @@ interface Testimonial {
   aiHint: string;
 }
 
-// Renamed to initialTestimonials to avoid conflict with state variable
 const initialTestimonials: Testimonial[] = [
   {
     quote: "Xoire's AI transformed our operations, boosting efficiency by 40% and unlocking new revenue streams. Truly game-changing!",
     name: "Eva Rostova",
     company: "CEO, QuantumLeap Tech",
-    avatar: "https://placehold.co/100x100/BF40BF/0A0A23.png?text=ER", // Purple accent
+    avatar: "https://placehold.co/100x100/BF40BF/0A0A23.png?text=ER",
     aiHint: "woman portrait",
   },
   {
     quote: "The AI trading bot developed by Xoire has consistently outperformed market benchmarks. Their expertise is unparalleled.",
     name: "Marcus Chen",
     company: "Founder, Apex Capital",
-    avatar: "https://placehold.co/100x100/A0A0D0/0A0A23.png?text=MC", // Silver accent
+    avatar: "https://placehold.co/100x100/A0A0D0/0A0A23.png?text=MC",
     aiHint: "man portrait",
   },
   {
     quote: "Our customer engagement skyrocketed after implementing Xoire's AI chatbot solution. Support costs are down, satisfaction is up.",
     name: "Lena Hernandez",
     company: "CMO, NovaRetail Group",
-    avatar: "https://placehold.co/100x100/FFFFFF/0A0A23.png?text=LH", // Foreground accent
+    avatar: "https://placehold.co/100x100/FFFFFF/0A0A23.png?text=LH",
     aiHint: "woman face",
   },
+   {
+    quote: "The predictive analytics from Xoire gave us a clear edge. We've seen a 25% increase in conversion rates.",
+    name: "Kenji Tanaka",
+    company: "Head of Growth, FutureScope Inc.",
+    avatar: "https://placehold.co/100x100/FFD700/0A0A23.png?text=KT", // Gold accent
+    aiHint: "asian man",
+  },
+  {
+    quote: "Xoire's team is brilliant. They delivered a complex AI system ahead of schedule and exceeding all expectations.",
+    name: "Sofia Al-Jamil",
+    company: "CTO, Innovate Solutions",
+    avatar: "https://placehold.co/100x100/00CED1/0A0A23.png?text=SA", // Dark turquoise accent
+    aiHint: "middle eastern woman",
+  },
 ];
+
+// Duplicate testimonials for seamless scrolling
+const duplicatedTestimonials = [...initialTestimonials, ...initialTestimonials];
 
 const stats = [
     { value: "$7.4M+", label: "Automated Annually", icon: TrendingUp, color: "text-primary" },
@@ -50,30 +66,13 @@ const sectionVariants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.2, duration: 0.5 } },
 };
 
-const itemVariants = {
+const itemVariants = { // Kept for stats cards
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] } },
 };
 
 
 export default function CaseStudiesSection() {
-  const [currentTestimonials, setCurrentTestimonials] = useState<Testimonial[]>(initialTestimonials);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentTestimonials(prevTestimonials => {
-        const newTestimonials = [...prevTestimonials];
-        const firstItem = newTestimonials.shift(); // Remove the first item
-        if (firstItem) {
-          newTestimonials.push(firstItem); // Add it to the end
-        }
-        return newTestimonials;
-      });
-    }, 5000); // Rotate every 5 seconds
-
-    return () => clearInterval(intervalId); // Cleanup on unmount
-  }, []); // Empty dependency array so it runs once on mount
-
   return (
     <section id="case-studies" className="py-20 md:py-32 bg-background">
       <div className="container">
@@ -92,7 +91,7 @@ export default function CaseStudiesSection() {
 
         <MotionDiv 
           className="grid md:grid-cols-3 gap-8 mb-16"
-          variants={sectionVariants} // Keep for stats initial load
+          variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
@@ -108,51 +107,40 @@ export default function CaseStudiesSection() {
           ))}
         </MotionDiv>
 
-        <MotionDiv 
-          className="grid md:grid-cols-1 lg:grid-cols-3 gap-8"
-          variants={sectionVariants} // For initial staggered load of testimonials
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-          layout // Added for the grid container to animate its own potential size changes
-        >
-          {currentTestimonials.map((testimonial) => ( // Map over the state variable
-            <MotionDiv 
-              key={testimonial.name} // Use a unique and stable key from the data
-              variants={itemVariants} // For initial animation of each item
-              layout // Enable layout animation for position changes
-              transition={{ type: "spring", stiffness: 200, damping: 25 }} // Controls the animation of re-positioning
-              whileHover={{ y: -10, transition: { type: "spring", stiffness: 300 } }}
-            >
-              <Card className="glassmorphic h-full flex flex-col p-6 group border-primary/30 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
-                <CardContent className="pt-6 flex-grow">
-                  <div className="flex items-center mb-4">
-                    <Image
-                      src={testimonial.avatar}
-                      alt={testimonial.name}
-                      width={60}
-                      height={60}
-                      className="rounded-full mr-4 border-2 border-primary group-hover:animate-pulse"
-                      data-ai-hint={testimonial.aiHint}
-                    />
-                    <div>
-                      <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors">{testimonial.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{testimonial.company}</p>
+        {/* Testimonial Carousel */}
+        <div className="relative w-full overflow-hidden group">
+          <div className="flex animate-scroll-testimonials group-hover:[animation-play-state:paused]">
+            {duplicatedTestimonials.map((testimonial, index) => (
+              <div key={`${testimonial.name}-${index}`} className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-4">
+                <Card className="glassmorphic h-full flex flex-col p-6 border-primary/30 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 transform hover:-translate-y-2">
+                  <CardContent className="pt-6 flex-grow">
+                    <div className="flex items-center mb-4">
+                      <Image
+                        src={testimonial.avatar}
+                        alt={testimonial.name}
+                        width={60}
+                        height={60}
+                        className="rounded-full mr-4 border-2 border-primary"
+                        data-ai-hint={testimonial.aiHint}
+                      />
+                      <div>
+                        <CardTitle className="text-lg font-semibold text-foreground">{testimonial.name}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{testimonial.company}</p>
+                      </div>
                     </div>
+                    <p className="text-muted-foreground italic">&quot;{testimonial.quote}&quot;</p>
+                  </CardContent>
+                  <div className="flex mt-4">
+                      {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="h-5 w-5 text-primary fill-primary" />
+                      ))}
                   </div>
-                  <p className="text-muted-foreground italic">&quot;{testimonial.quote}&quot;</p>
-                </CardContent>
-                <div className="flex mt-4">
-                    {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 text-primary fill-primary" />
-                    ))}
-                </div>
-              </Card>
-            </MotionDiv>
-          ))}
-        </MotionDiv>
+                </Card>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
 }
-

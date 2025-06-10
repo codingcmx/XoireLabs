@@ -92,11 +92,16 @@ export default {
           '0%, 100%': { opacity: '1', boxShadow: '0 0 3px hsl(var(--primary)/0.7), 0 0 6px hsl(var(--primary)/0.5)' },
           '50%': { opacity: '0.8', boxShadow: '0 0 6px hsl(var(--primary)/0.5), 0 0 12px hsl(var(--primary)/0.3)' },
         },
+        'scroll-testimonials': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' }, // Scrolls one full set of original items
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'pulse-glow': 'pulse-glow 2.5s infinite ease-in-out', // Slightly slower pulse
+        'scroll-testimonials': 'scroll-testimonials 40s linear infinite', // Adjust duration as needed
       },
       boxShadow: { // Removed neon-specific box shadows
          'soft-primary': '0 0 10px hsl(var(--primary)/0.3), 0 0 20px hsl(var(--primary)/0.2)',
