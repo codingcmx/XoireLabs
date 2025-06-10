@@ -109,7 +109,10 @@ export default function CaseStudiesSection() {
 
         {/* Testimonial Carousel */}
         <div className="relative w-full overflow-hidden group">
-          <div className="flex animate-scroll-testimonials group-hover:[animation-play-state:paused]">
+          <div 
+            className="flex animate-scroll-testimonials group-hover:[animation-play-state:paused]"
+            style={{ willChange: 'transform' }}
+          >
             {duplicatedTestimonials.map((testimonial, index) => (
               <div key={`${testimonial.name}-${index}`} className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-4">
                 <Card className="glassmorphic h-full flex flex-col p-6 border-primary/30 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 transform hover:-translate-y-2">
@@ -144,3 +147,4 @@ export default function CaseStudiesSection() {
     </section>
   );
 }
+
