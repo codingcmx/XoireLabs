@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import MotionDiv from '@/components/motion/motion-div';
 import { Star, TrendingUp, Users } from 'lucide-react';
+import { useState, useEffect } from 'react'; // Added useState and useEffect
 
 interface Testimonial {
   quote: string;
@@ -13,7 +14,8 @@ interface Testimonial {
   aiHint: string;
 }
 
-const testimonials: Testimonial[] = [
+// Renamed to initialTestimonials to avoid conflict with state variable
+const initialTestimonials: Testimonial[] = [
   {
     quote: "Xoire's AI transformed our operations, boosting efficiency by 40% and unlocking new revenue streams. Truly game-changing!",
     name: "Eva Rostova",
@@ -55,6 +57,23 @@ const itemVariants = {
 
 
 export default function CaseStudiesSection() {
+  const [currentTestimonials, setCurrentTestimonials] = useState<Testimonial[]>(initialTestimonials);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTestimonials(prevTestimonials => {
+        const newTestimonials = [...prevTestimonials];
+        const firstItem = newTestimonials.shift(); // Remove the first item
+        if (firstItem) {
+          newTestimonials.push(firstItem); // Add it to the end
+        }
+        return newTestimonials;
+      });
+    }, 5000); // Rotate every 5 seconds
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, []); // Empty dependency array so it runs once on mount
+
   return (
     <section id="case-studies" className="py-20 md:py-32 bg-background">
       <div className="container">
@@ -73,7 +92,7 @@ export default function CaseStudiesSection() {
 
         <MotionDiv 
           className="grid md:grid-cols-3 gap-8 mb-16"
-          variants={sectionVariants}
+          variants={sectionVariants} // Keep for stats initial load
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
@@ -91,15 +110,18 @@ export default function CaseStudiesSection() {
 
         <MotionDiv 
           className="grid md:grid-cols-1 lg:grid-cols-3 gap-8"
-          variants={sectionVariants}
+          variants={sectionVariants} // For initial staggered load of testimonials
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
+          layout // Added for the grid container to animate its own potential size changes
         >
-          {testimonials.map((testimonial, index) => (
+          {currentTestimonials.map((testimonial) => ( // Map over the state variable
             <MotionDiv 
-              key={index} 
-              variants={itemVariants}
+              key={testimonial.name} // Use a unique and stable key from the data
+              variants={itemVariants} // For initial animation of each item
+              layout // Enable layout animation for position changes
+              transition={{ type: "spring", stiffness: 200, damping: 25 }} // Controls the animation of re-positioning
               whileHover={{ y: -10, transition: { type: "spring", stiffness: 300 } }}
             >
               <Card className="glassmorphic h-full flex flex-col p-6 group border-primary/30 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
@@ -133,3 +155,4 @@ export default function CaseStudiesSection() {
     </section>
   );
 }
+
