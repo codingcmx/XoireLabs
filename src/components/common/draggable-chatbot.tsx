@@ -7,8 +7,8 @@ import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical } from 'lu
 const DraggableChatbot = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [isShown, setIsShown] = useState(true); // New state for showing/hiding
+  const [isMinimized, setIsMinimized] = useState(true); // Changed to true for minimized by default
+  const [isShown, setIsShown] = useState(true);
   const [initialPos, setInitialPos] = useState({ x: 0, y: 0 });
   const draggableRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -16,15 +16,18 @@ const DraggableChatbot = () => {
   useEffect(() => {
     setIsMounted(true);
     // Set initial position to bottom-right
-    const initialX = window.innerWidth - 350 - 20; // 350px width, 20px offset
-    const initialY = window.innerHeight - 500 - 20; // 500px height, 20px offset
+    // Uses the current value of isMinimized to determine initial size for positioning
+    const currentWidth = isMinimized ? 60 : 350;
+    const currentHeight = isMinimized ? 60 : 500;
+    const initialX = window.innerWidth - currentWidth - 20; 
+    const initialY = window.innerHeight - currentHeight - 20;
     setPosition({ x: initialX > 0 ? initialX : 0, y: initialY > 0 ? initialY : 0 });
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMinimized]); // Added isMinimized here so it re-calculates if default state changes, though for initial it's fine.
 
 
   const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
     if (!draggableRef.current || e.target instanceof HTMLButtonElement || (e.target as HTMLElement).closest('button')) {
-      // Prevent dragging if clicking on a button within the header
       return;
     }
     setIsDragging(true);
@@ -67,7 +70,7 @@ const DraggableChatbot = () => {
     };
   }, [isDragging, initialPos]);
 
-  if (!isMounted || !isShown) { // Check isShown state here
+  if (!isMounted || !isShown) {
     return null; 
   }
 
@@ -101,7 +104,7 @@ const DraggableChatbot = () => {
             {isMinimized ? <Maximize size={14} /> : <Minus size={14} />}
           </button>
           <button
-            onClick={() => setIsShown(false)} // Close button action
+            onClick={() => setIsShown(false)}
             className="p-1 rounded hover:bg-destructive/20 text-destructive"
             aria-label="Close chat"
           >
