@@ -11,11 +11,11 @@ interface System {
   id: string;
   name: string;
   description: string;
-  imageSrc: string; // Fallback poster for card video if videoPosterUrl not available
-  aiHintCard: string; // AI hint for the card image/poster
-  videoSrc: string; // Path to the video in public/videos
+  imageSrc: string; // Fallback for card if videoPosterUrl isn't ideal
+  aiHintCard: string; 
+  videoSrc: string; // External URL for the video
   videoPosterUrl: string; // Poster for the video on card & in dialog
-  aiHintVideo: string; // AI hint for the video
+  aiHintVideo: string; 
   details: {
     feature: string;
     benefit: string;
@@ -27,10 +27,10 @@ const systems: System[] = [
     id: "tradetitan",
     name: "TradeTitan AI",
     description: "Automated high-frequency trading bot with adaptive learning algorithms.",
-    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=TradeTitan", 
-    aiHintCard: "trading graph", // Kept if needed as fallback
-    videoSrc: "/videos/tradetitan-demo.mp4",
-    videoPosterUrl: "https://placehold.co/600x300/0A0A23/BF40BF.png?text=TradeTitan+Vid", // Adjusted aspect for card
+    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=TradeTitan+Card", 
+    aiHintCard: "trading graph", 
+    videoSrc: "https://your-video-hosting.com/path-to/tradetitan-system-demo.mp4", // REPLACE THIS URL
+    videoPosterUrl: "https://placehold.co/600x300/0A0A23/BF40BF.png?text=TradeTitan+Video+Poster", 
     aiHintVideo: "financial graph animation",
     details: [
       { feature: "Real-time market analysis", benefit: "Maximizes profit opportunities 24/7." },
@@ -42,10 +42,10 @@ const systems: System[] = [
     id: "autonexus",
     name: "AutoNexus Flow",
     description: "Intelligent process automation for complex enterprise workflows.",
-    imageSrc: "https://placehold.co/600x400/0A0A23/A0A0D0.png?text=AutoNexus", 
-    aiHintCard: "flow chart", // Kept if needed as fallback
-    videoSrc: "/videos/autonexus-demo.mp4",
-    videoPosterUrl: "https://placehold.co/600x300/0A0A23/A0A0D0.png?text=AutoNexus+Vid", // Adjusted aspect for card
+    imageSrc: "https://placehold.co/600x400/0A0A23/A0A0D0.png?text=AutoNexus+Card", 
+    aiHintCard: "flow chart", 
+    videoSrc: "https://your-video-hosting.com/path-to/autonexus-system-demo.mp4", // REPLACE THIS URL
+    videoPosterUrl: "https://placehold.co/600x300/0A0A23/A0A0D0.png?text=AutoNexus+Video+Poster", 
     aiHintVideo: "process automation flowchart",
     details: [
       { feature: "AI-driven decision making", benefit: "Optimizes operational efficiency." },
@@ -57,10 +57,10 @@ const systems: System[] = [
     id: "leadspark", 
     name: "LeadSpark AI", 
     description: "AI-driven lead discovery, qualification, and engagement engine.", 
-    imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=LeadSpark", 
-    aiHintCard: "connections network", // Kept if needed as fallback
-    videoSrc: "/videos/leadspark-demo.mp4",
-    videoPosterUrl: "https://placehold.co/600x300/0A0A23/FFFFFF.png?text=LeadGen", // Updated text
+    imageSrc: "https://placehold.co/600x400/0A0A23/FFFFFF.png?text=LeadSpark+Card", 
+    aiHintCard: "connections network", 
+    videoSrc: "https://your-video-hosting.com/path-to/leadspark-system-demo.mp4", // REPLACE THIS URL
+    videoPosterUrl: "https://placehold.co/600x300/0A0A23/FFFFFF.png?text=LeadSpark+Video+Poster", 
     aiHintVideo: "lead generation interface",
     details: [
       { feature: "Targeted prospect identification", benefit: "Uncovers high-potential leads based on ideal customer profiles." },
@@ -112,9 +112,9 @@ export default function SignatureSystemsSection() {
               className="h-full"
             >
               <Card className="glassmorphic group h-full flex flex-col overflow-hidden border-accent/30 hover:border-accent/70 transition-all duration-300 ease-out">
-                <CardHeader className="p-0 relative aspect-[16/9] overflow-hidden"> {/* Adjusted aspect ratio for video */}
+                <CardHeader className="p-0 relative aspect-[16/9] overflow-hidden">
                   <video
-                    src={system.videoSrc}
+                    src={system.videoSrc} // Use external video source
                     poster={system.videoPosterUrl || system.imageSrc}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     data-ai-hint={system.aiHintVideo}
@@ -122,7 +122,7 @@ export default function SignatureSystemsSection() {
                     loop
                     muted
                     playsInline
-                    preload="auto" // Ensure video metadata loads for autoplay
+                    preload="metadata" 
                   >
                     Your browser does not support the video tag.
                   </video>
@@ -148,17 +148,13 @@ export default function SignatureSystemsSection() {
                       <div className="grid gap-6 py-4">
                         <div className="aspect-video bg-muted rounded-lg overflow-hidden border border-border">
                           <video
-                            autoPlay
-                            loop
-                            muted
-                            playsInline 
+                            src={system.videoSrc} // Use external video source
                             poster={system.videoPosterUrl}
                             className="w-full h-full object-cover"
-                            preload="auto" 
+                            preload="metadata" 
                             data-ai-hint={system.aiHintVideo}
                             controls // Keep controls in dialog for user interaction
                           >
-                            <source src={system.videoSrc} type="video/mp4" />
                             Your browser does not support the video tag.
                           </video>
                         </div>
@@ -188,4 +184,3 @@ export default function SignatureSystemsSection() {
     </section>
   );
 }
-

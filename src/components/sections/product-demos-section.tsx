@@ -10,8 +10,8 @@ const demos = [
     title: "TradeTitan AI In Action",
     description: "See how TradeTitan AI analyzes markets and executes trades in real-time.",
     icon: BarChart3,
-    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/BF40BF.png?text=TradeTitan+Demo",
-    videoSrc: "/videos/tradetitan-demo.mp4", // Example path, replace with your actual video file
+    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/BF40BF.png?text=TradeTitan+Demo+Poster",
+    videoSrc: "https://your-video-hosting.com/path-to/tradetitan-demo.mp4", // REPLACE THIS URL
     aiHint: "financial graph animation"
   },
   {
@@ -19,8 +19,8 @@ const demos = [
     title: "AutoNexus Workflow Automation",
     description: "Watch AutoNexus streamline a complex business process from start to finish.",
     icon: PlayCircle,
-    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/A0A0D0.png?text=AutoNexus+Demo",
-    videoSrc: "/videos/autonexus-demo.mp4", // Example path, replace with your actual video file
+    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/A0A0D0.png?text=AutoNexus+Demo+Poster",
+    videoSrc: "https://your-video-hosting.com/path-to/autonexus-demo.mp4", // REPLACE THIS URL
     aiHint: "process automation flowchart"
   },
   {
@@ -28,8 +28,8 @@ const demos = [
     title: "LeadSpark AI Lead Gen Demo",
     description: "Discover how LeadSpark AI identifies and qualifies high-potential leads.",
     icon: Bot,
-    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadGen+Demo", // Updated text
-    videoSrc: "/videos/leadspark-demo.mp4", // Example path, replace with your actual video file
+    videoPosterUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadSpark+Demo+Poster",
+    videoSrc: "https://your-video-hosting.com/path-to/leadspark-demo.mp4", // REPLACE THIS URL
     aiHint: "lead generation interface"
   },
 ];
@@ -87,17 +87,17 @@ export default function ProductDemosSection() {
                         controls
                         poster={demo.videoPosterUrl}
                         className="w-full h-full object-cover"
-                        preload="metadata" // Good for performance, loads only metadata
-                        data-ai-hint={demo.aiHint} // Keep hint for poster if needed
+                        preload="metadata"
+                        data-ai-hint={demo.aiHint}
+                        src={demo.videoSrc} // Use the external video source
                     >
-                        <source src={demo.videoSrc} type="video/mp4" />
-                        {/* Add other source types if you have them, e.g., webm, ogg */}
-                        {/* <source src={demo.videoSrc.replace('.mp4', '.webm')} type="video/webm" /> */}
+                        {/* You can add <source> tags here if you have multiple formats for the same video */}
+                        {/* e.g., <source src={demo.videoSrc.replace('.mp4', '.webm')} type="video/webm" /> */}
                         Your browser does not support the video tag.
                     </video>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Remember to place your video file at: public{demo.videoSrc}
+                    Video hosted externally. Ensure the link is correct and accessible.
                   </p>
                 </CardContent>
               </Card>
@@ -108,4 +108,3 @@ export default function ProductDemosSection() {
     </section>
   );
 }
-
