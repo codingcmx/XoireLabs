@@ -4,12 +4,14 @@
  * @fileOverview A Genkit flow to power the Xoire AI website chatbot.
  *
  * - xoireChat - A function that handles chat interactions.
- * - XoireChatInputSchema - The input type for the xoireChat function.
- * - XoireChatOutputSchema - The return type for the xoireChat function.
+ * - XoireChatInput - The input type for the xoireChat function.
+ * - XoireChatOutput - The return type for the xoireChat function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import type { MessageDataPart } from 'genkit';
+
 
 // Define the knowledge base for the chatbot
 const XoireKnowledgeBase = `
@@ -102,10 +104,8 @@ const xoireChatFlow = ai.defineFlow(
     outputSchema: XoireChatOutputSchema,
   },
   async (input) => {
-    const messages: Array<{role: 'user' | 'model', parts: Array<{text: string}>}> = [];
+    const messages: Array<{role: 'user' | 'model', parts: Array<MessageDataPart>}> = [];
 
-    // Add the system context and knowledge base as the first "user" message, followed by a model "ack"
-    // This helps set the stage for the model.
     messages.push({
       role: 'user',
       parts: [{ text: `System Instructions:\n${XoireKnowledgeBase}\n\nOkay, I am ready to assist based on this knowledge.` }]
@@ -122,21 +122,42 @@ const xoireChatFlow = ai.defineFlow(
 
     try {
       const genkitResponse = await ai.generate({
-        prompt: messages, // Pass the constructed message history
+        prompt: messages,
         config: {
-          temperature: 0.3, // Lower temperature for more factual and less creative responses
+          temperature: 0.3,
           candidateCount: 1,
         },
-        // Ensure the model used by `ai` (googleai/gemini-2.0-flash by default) is suitable for chat.
-        // For more complex chat, gemini-pro might be preferred, but flash should handle this.
       });
 
-      const responseText = genkitResponse.output?.text || "I'm sorry, I encountered an issue processing your request. Please try again.";
+      if (!genkitResponse || !genkitResponse.output) {
+        console.warn("Genkit response or output is missing. Full response object:", genkitResponse);
+        return {response: "I received an incomplete or unexpected response from the AI. Please try again."};
+      }
+      
+      const responseText = genkitResponse.output.text;
+
+      if (typeof responseText !== 'string') {
+        console.warn("Genkit output.text is not a string. Output received:", genkitResponse.output);
+        return {response: "The AI's response was not in the expected text format. Please try again."};
+      }
+
+      if (!responseText.trim()) {
+          console.warn("Genkit returned an empty text response. This might be due to safety filters or the query itself. Full response object:", genkitResponse);
+          return {response: "I'm unable to provide a response to that, perhaps due to content guidelines or the nature of the query. Could you try rephrasing or asking something else?"};
+      }
+      
       return {response: responseText};
 
     } catch (error) {
-      console.error("Error in xoireChatFlow:", error);
-      return {response: "My apologies, I'm currently experiencing technical difficulties. Please try again shortly."};
+      console.error("Error in xoireChatFlow during AI generation:", error);
+      let errorMessage = "My apologies, I'm currently experiencing technical difficulties. Please try again shortly.";
+      if (error instanceof Error && error.message) {
+        // You might want to check for specific error messages from Google AI here
+        // For example, if error.message.includes("API key not valid") or "quota".
+        // This can help in diagnosing if the API key is the issue.
+        errorMessage = `An error occurred while processing your request: ${error.message}. Please try again. If the issue persists, our technical team has been notified.`;
+      }
+      return {response: errorMessage};
     }
   }
 );
