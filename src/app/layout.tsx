@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react'; // Added import
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import DraggableChatbot from '@/components/common/draggable-chatbot';
+
 
 export const metadata: Metadata = {
   title: 'Xoire AI: The 5th Dimension',
@@ -10,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode; // Now ReactNode is explicitly imported
 }>) {
   return (
     <html lang="en">
@@ -23,6 +26,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         {children}
         <Toaster />
+        <DraggableChatbot />
       </body>
     </html>
   );
