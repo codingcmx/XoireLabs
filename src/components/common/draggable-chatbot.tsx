@@ -1,8 +1,19 @@
 
 "use client";
 
-import { useState, useRef, type MouseEvent as ReactMouseEvent, useEffect } from 'react';
-import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical } from 'lucide-react';
+import { useState, useRef, type MouseEvent as ReactMouseEvent, useEffect, type FormEvent } from 'react';
+import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical, Send, Loader2, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input'; // Using Input for single line, Textarea for multiline
+import { ScrollArea } from '@/components/ui/scroll-area'; // For scrollable chat messages
+import { xoireChat, type XoireChatInput, type XoireChatOutput } from '@/ai/flows/xoire-chat-flow';
+import type { MessageData } from 'genkit';
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'bot';
+  text: string;
+}
 
 const DraggableChatbot = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -12,19 +23,35 @@ const DraggableChatbot = () => {
   const draggableRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
 
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     setIsMounted(true);
-    const currentWidth = isMinimized ? 60 : 350;
-    const currentHeight = isMinimized ? 60 : 500;
+    const currentWidth = isMinimized ? 60 : 380; // Increased width for chat
+    const currentHeight = isMinimized ? 60 : 550; // Increased height for chat
     const initialX = window.innerWidth - currentWidth - 20;
     const initialY = window.innerHeight - currentHeight - 20;
     setPosition({ x: initialX > 0 ? initialX : 0, y: initialY > 0 ? initialY : 0 });
+
+    if (!isMinimized && messages.length === 0) {
+      setMessages([{id: 'initial-greeting', role: 'bot', text: "Hello! I'm the Xoire AI Assistant. How can I help you learn about Xoire AI today?"}]);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMinimized]);
+  }, [isMinimized, isMounted]);
+
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
 
   const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
-    if (!draggableRef.current || e.target instanceof HTMLButtonElement || (e.target as HTMLElement).closest('button')) {
+    if (!draggableRef.current || e.target instanceof HTMLButtonElement || (e.target as HTMLElement).closest('button') || e.target instanceof HTMLInputElement || (e.target as HTMLElement).closest('input')) {
       return;
     }
     setIsDragging(true);
@@ -68,6 +95,48 @@ const DraggableChatbot = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging, initialPos]);
 
+  const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const userMessageText = inputValue.trim();
+    if (!userMessageText || isLoading) return;
+
+    const newUserMessage: ChatMessage = { id: Date.now().toString(), role: 'user', text: userMessageText };
+    setMessages(prev => [...prev, newUserMessage]);
+    setInputValue('');
+    setIsLoading(true);
+
+    // Prepare history for Genkit flow
+    const historyForGenkit: MessageData = messages
+      .filter(msg => msg.id !== 'initial-greeting') // Exclude initial greeting from history sent to AI
+      .map(msg => ({
+        role: msg.role === 'bot' ? 'model' : 'user', // Map 'bot' to 'model'
+        parts: [{ text: msg.text }],
+    }));
+
+    try {
+      const input: XoireChatInput = {
+        message: userMessageText,
+        history: historyForGenkit,
+      };
+      const result: XoireChatOutput = await xoireChat(input);
+      const botResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: result.response };
+      setMessages(prev => [...prev, botResponse]);
+    } catch (error) {
+      console.error("Error calling xoireChat flow:", error);
+      const errorResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: "Sorry, I'm having trouble connecting right now. Please try again later." };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const toggleMinimize = () => {
+    setIsMinimized(!isMinimized);
+    if (isMinimized && messages.length === 0) { // If expanding and chat is empty, add greeting
+        setMessages([{id: 'initial-greeting', role: 'bot', text: "Hello! I'm the Xoire AI Assistant. How can I help you learn about Xoire AI today?"}]);
+    }
+  }
+
   if (!isMounted) {
     return null;
   }
@@ -79,56 +148,98 @@ const DraggableChatbot = () => {
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
-        width: isMinimized ? '60px' : '350px',
-        height: isMinimized ? '60px' : '500px',
-        overflow: 'hidden',
+        width: isMinimized ? '60px' : '380px',
+        height: isMinimized ? '60px' : '550px',
       }}
     >
       <div
         className={`flex items-center justify-between p-2 bg-primary/10 border-b border-primary/30 ${!isMinimized && 'cursor-grab'}`}
         onMouseDown={!isMinimized ? handleMouseDown : undefined}
       >
-        <div className="flex items-center text-primary">
+        <div className="flex items-center text-primary select-none">
           {!isMinimized && <GripVertical size={18} className="mr-1 text-primary/50" />}
           <MessageSquare size={18} className="mr-2" />
-          {!isMinimized && <span className="font-semibold text-sm select-none">Xoire AI Assistant</span>}
+          {!isMinimized && <span className="font-semibold text-sm">Xoire AI Assistant</span>}
         </div>
         <div className="flex items-center space-x-1">
           <button
-            onClick={() => setIsMinimized(!isMinimized)}
+            onClick={toggleMinimize}
             className="p-1 rounded hover:bg-primary/20 text-primary"
             aria-label={isMinimized ? "Expand chat" : "Minimize chat"}
           >
             {isMinimized ? <Maximize size={14} /> : <Minus size={14} />}
           </button>
-          <button
-            onClick={() => setIsMinimized(true)} // Changed this line
-            className="p-1 rounded hover:bg-destructive/20 text-destructive"
-            aria-label="Minimize chat" // Changed aria-label for clarity
-          >
-            <CloseIcon size={16} />
-          </button>
+          {!isMinimized && (
+            <button
+                onClick={() => setIsMinimized(true)}
+                className="p-1 rounded hover:bg-destructive/20 text-destructive"
+                aria-label="Close chat (Minimize)"
+            >
+                <CloseIcon size={16} />
+            </button>
+          )}
         </div>
       </div>
 
       {!isMinimized && (
-        <div className="flex-grow p-0 bg-background">
-          <iframe
-            src="https://xoire-s-vision.vercel.app"
-            title="Xoire AI Chatbot"
-            className="w-full h-full border-none"
-            allow="microphone"
-          />
+        <div className="flex flex-col flex-grow overflow-hidden bg-background">
+          <ScrollArea className="flex-grow p-4 space-y-3" ref={chatContainerRef}>
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg px-3 py-2 text-sm shadow-md ${
+                    msg.role === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {msg.text.split('\\n').map((line, index) => (
+                    <span key={index}>
+                      {line}
+                      {index < msg.text.split('\\n').length - 1 && <br />}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="max-w-[80%] rounded-lg px-3 py-2 text-sm shadow-md bg-muted text-muted-foreground flex items-center">
+                  <Sparkles className="w-4 h-4 mr-2 animate-pulse text-primary" />
+                  <span>Thinking...</span>
+                </div>
+              </div>
+            )}
+          </ScrollArea>
+          <form onSubmit={handleSendMessage} className="p-3 border-t border-primary/30 bg-background">
+            <div className="flex items-center space-x-2">
+              <Input
+                type="text"
+                placeholder="Ask Xoire AI..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                className="flex-grow bg-input border-border focus:ring-primary"
+                disabled={isLoading}
+                aria-label="Chat message input"
+              />
+              <Button type="submit" size="icon" disabled={isLoading || !inputValue.trim()} aria-label="Send message">
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              </Button>
+            </div>
+          </form>
         </div>
       )}
        {isMinimized && (
         <div
             className="flex-grow flex items-center justify-center cursor-pointer"
-            onClick={() => setIsMinimized(false)}
+            onClick={toggleMinimize}
             role="button"
             tabIndex={0}
             aria-label="Expand chat"
-            onKeyDown={(e) => e.key === 'Enter' && setIsMinimized(false)}
+            onKeyDown={(e) => e.key === 'Enter' && toggleMinimize()}
         >
             <MessageSquare size={24} className="text-primary animate-pulse" />
         </div>
