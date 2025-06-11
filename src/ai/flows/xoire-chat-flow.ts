@@ -10,11 +10,16 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import type { MessageDataPart } from 'genkit';
+import type { MessageData, MessageDataPart } from 'genkit';
 
 
-// Define the knowledge base for the chatbot
-const XoireKnowledgeBase = `
+// Define the knowledge base and system instructions for the chatbot
+const systemInstructions = `
+You are the Xoire AI Assistant. Your goal is to be knowledgeable, professional, extremely helpful, and maintain a slightly futuristic and innovative tone.
+Strictly adhere to the following knowledge base to answer user questions. Do not make up information or answer questions outside of this scope.
+
+Xoire Knowledge Base:
+---
 Xoire AI: The 5th Dimension. Tagline: "Build Smart. Scale Faster. Rule with AI."
 We are an AI solutions provider, offering full-stack AI systems. We handle everything from data to deployment. Our website is built with NextJS, React, ShadCN UI, Tailwind, and Genkit for AI.
 
@@ -69,14 +74,14 @@ Website Navigation:
 *   Why Xoire: Dedicated /why-xoire page.
 *   FAQs: Link to #faq on homepage.
 *   Book Meeting: Dedicated /book-meeting page with Calendly embed.
+---
 
-Your Role: You are the Xoire AI Assistant. Be knowledgeable, professional, extremely helpful, and maintain a slightly futuristic and innovative tone.
-*   Answer user questions based *strictly* on this Xoire Knowledge Base.
-*   If the answer is in the knowledge base, provide it.
-*   If the information is on a specific page or section, mention it (e.g., "You can find more details on our Services page.").
-*   If a question is too complex, very specific to a user's unique business, requires pricing, or is outside this knowledge base, politely state that you recommend booking a meeting or using the contact form for a detailed discussion with our experts.
-*   Do not make up information or answer questions outside of this knowledge base.
-*   Keep responses concise but informative.
+Interaction Guidelines:
+*   If the answer to a user's question is within the knowledge base, provide it concisely.
+*   If the information is detailed on a specific page or section of the website, mention it (e.g., "You can find more details about our AI Trading Systems on our Systems page.").
+*   If a question is highly specific to a user's unique business, requires pricing details, or falls outside the scope of this knowledge base, politely state that you recommend booking a meeting or using the contact form for a detailed discussion with our experts.
+*   Keep responses concise but informative. Avoid making up information.
+*   Start the conversation with a friendly greeting and offer assistance.
 `;
 
 const XoireChatInputSchema = z.object({
@@ -104,45 +109,36 @@ const xoireChatFlow = ai.defineFlow(
     outputSchema: XoireChatOutputSchema,
   },
   async (input) => {
-    const messages: Array<{role: 'user' | 'model', parts: Array<MessageDataPart>}> = [];
+    const conversationMessages: Array<MessageData> = [];
 
-    messages.push({
-      role: 'user',
-      parts: [{ text: `System Instructions:\n${XoireKnowledgeBase}\n\nOkay, I am ready to assist based on this knowledge.` }]
-    });
-    messages.push({
-      role: 'model',
-      parts: [{ text: "Understood. I am the Xoire AI Assistant, ready to help with information about Xoire AI based on the provided knowledge. How can I assist you today?" }]
-    });
-    
     if (input.history) {
-      messages.push(...input.history);
+      conversationMessages.push(...input.history);
     }
-    messages.push({ role: 'user', parts: [{ text: input.message }] });
+    conversationMessages.push({ role: 'user', parts: [{ text: input.message }] });
 
     try {
       const genkitResponse = await ai.generate({
-        prompt: messages,
+        prompt: conversationMessages, // Pass the conversation history and current message
+        system: systemInstructions, // Pass the knowledge base and system role instructions
         config: {
           temperature: 0.3,
-          candidateCount: 1,
         },
       });
-
+      
       if (!genkitResponse || !genkitResponse.output) {
-        console.warn("Genkit response or output is missing. Full response object:", genkitResponse);
+        console.warn("Genkit response or output is missing in xoireChatFlow. Full response object:", genkitResponse);
         return {response: "I received an incomplete or unexpected response from the AI. Please try again."};
       }
       
       const responseText = genkitResponse.output.text;
 
       if (typeof responseText !== 'string') {
-        console.warn("Genkit output.text is not a string. Output received:", genkitResponse.output);
+        console.warn("Genkit output.text is not a string in xoireChatFlow. Output received:", genkitResponse.output);
         return {response: "The AI's response was not in the expected text format. Please try again."};
       }
 
       if (!responseText.trim()) {
-          console.warn("Genkit returned an empty text response. This might be due to safety filters or the query itself. Full response object:", genkitResponse);
+          console.warn("Genkit returned an empty text response in xoireChatFlow. This might be due to safety filters or the query itself. Full response object:", genkitResponse);
           return {response: "I'm unable to provide a response to that, perhaps due to content guidelines or the nature of the query. Could you try rephrasing or asking something else?"};
       }
       
@@ -152,9 +148,6 @@ const xoireChatFlow = ai.defineFlow(
       console.error("Error in xoireChatFlow during AI generation:", error);
       let errorMessage = "My apologies, I'm currently experiencing technical difficulties. Please try again shortly.";
       if (error instanceof Error && error.message) {
-        // You might want to check for specific error messages from Google AI here
-        // For example, if error.message.includes("API key not valid") or "quota".
-        // This can help in diagnosing if the API key is the issue.
         errorMessage = `An error occurred while processing your request: ${error.message}. Please try again. If the issue persists, our technical team has been notified.`;
       }
       return {response: errorMessage};
