@@ -77,7 +77,7 @@ Your Role: You are the Xoire AI Assistant. Be knowledgeable, professional, extre
 *   Keep responses concise but informative.
 `;
 
-export const XoireChatInputSchema = z.object({
+const XoireChatInputSchema = z.object({
   message: z.string().describe("The user's current message to the chatbot."),
   history: z.array(z.object({
     role: z.enum(['user', 'model']),
@@ -86,7 +86,7 @@ export const XoireChatInputSchema = z.object({
 });
 export type XoireChatInput = z.infer<typeof XoireChatInputSchema>;
 
-export const XoireChatOutputSchema = z.object({
+const XoireChatOutputSchema = z.object({
   response: z.string().describe("The chatbot's response."),
 });
 export type XoireChatOutput = z.infer<typeof XoireChatOutputSchema>;
