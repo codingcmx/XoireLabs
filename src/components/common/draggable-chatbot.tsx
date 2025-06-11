@@ -4,16 +4,21 @@
 import { useState, useRef, type MouseEvent as ReactMouseEvent, useEffect, type FormEvent } from 'react';
 import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical, Send, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input'; // Using Input for single line, Textarea for multiline
-import { ScrollArea } from '@/components/ui/scroll-area'; // For scrollable chat messages
-import { xoireChat, type XoireChatInput, type XoireChatOutput } from '@/ai/flows/xoire-chat-flow';
-import type { MessageData } from 'genkit';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+// Removed import for xoireChat Genkit flow
+// import { xoireChat, type XoireChatInput, type XoireChatOutput } from '@/ai/flows/xoire-chat-flow';
+// import type { MessageData } from 'genkit'; // No longer needed if not using Genkit types directly for history
 
 interface ChatMessage {
   id: string;
-  role: 'user' | 'bot';
+  role: 'user' | 'bot'; // Changed 'model' back to 'bot' for UI consistency if external API uses 'bot'
   text: string;
 }
+
+// Placeholder for the external chatbot API endpoint
+const EXTERNAL_CHATBOT_API_URL = "YOUR_EXTERNAL_CHATBOT_API_ENDPOINT_HERE";
+// Example: const EXTERNAL_CHATBOT_API_URL = "https://your-chatbot-brain.com/api/chat";
 
 const DraggableChatbot = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -30,8 +35,8 @@ const DraggableChatbot = () => {
 
   useEffect(() => {
     setIsMounted(true);
-    const currentWidth = isMinimized ? 60 : 380; // Increased width for chat
-    const currentHeight = isMinimized ? 60 : 550; // Increased height for chat
+    const currentWidth = isMinimized ? 60 : 380;
+    const currentHeight = isMinimized ? 60 : 550;
     const initialX = window.innerWidth - currentWidth - 20;
     const initialY = window.innerHeight - currentHeight - 20;
     setPosition({ x: initialX > 0 ? initialX : 0, y: initialY > 0 ? initialY : 0 });
@@ -100,30 +105,55 @@ const DraggableChatbot = () => {
     const userMessageText = inputValue.trim();
     if (!userMessageText || isLoading) return;
 
+    if (EXTERNAL_CHATBOT_API_URL === "YOUR_EXTERNAL_CHATBOT_API_ENDPOINT_HERE") {
+        alert("Please configure the EXTERNAL_CHATBOT_API_URL in DraggableChatbot.tsx");
+        setIsLoading(false);
+        return;
+    }
+
     const newUserMessage: ChatMessage = { id: Date.now().toString(), role: 'user', text: userMessageText };
     setMessages(prev => [...prev, newUserMessage]);
     setInputValue('');
     setIsLoading(true);
 
-    // Prepare history for Genkit flow
-    const historyForGenkit: MessageData = messages
-      .filter(msg => msg.id !== 'initial-greeting') // Exclude initial greeting from history sent to AI
+    // Prepare history for the external API
+    // This assumes your external API expects history in a similar format. Adjust if needed.
+    const historyForAPI = messages
+      .filter(msg => msg.id !== 'initial-greeting') 
       .map(msg => ({
-        role: msg.role === 'bot' ? 'model' : 'user', // Map 'bot' to 'model'
-        parts: [{ text: msg.text }],
+        role: msg.role, // Use 'user' or 'bot' as defined in ChatMessage
+        text: msg.text,
     }));
 
     try {
-      const input: XoireChatInput = {
-        message: userMessageText,
-        history: historyForGenkit,
-      };
-      const result: XoireChatOutput = await xoireChat(input);
-      const botResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: result.response };
+      // Call the external chatbot API
+      const response = await fetch(EXTERNAL_CHATBOT_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userMessageText,
+          history: historyForAPI, // Send conversation history
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: "Unknown error from external API" }));
+        throw new Error(errorData.detail || `External API Error: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      // Assuming the external API returns a response in a field like 'response' or 'text'
+      const botResponseText = result.response || result.text || "Sorry, I didn't get a valid response.";
+      const botResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: botResponseText };
       setMessages(prev => [...prev, botResponse]);
+
     } catch (error) {
-      console.error("Error calling xoireChat flow:", error);
-      const errorResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: "Sorry, I'm having trouble connecting right now. Please try again later." };
+      console.error("Error calling external chatbot API:", error);
+      const errorMessage = error instanceof Error ? error.message : "Could not connect to the chatbot.";
+      const errorResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: `Error: ${errorMessage}` };
       setMessages(prev => [...prev, errorResponse]);
     } finally {
       setIsLoading(false);
@@ -132,7 +162,7 @@ const DraggableChatbot = () => {
   
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
-    if (isMinimized && messages.length === 0) { // If expanding and chat is empty, add greeting
+    if (isMinimized && messages.length === 0) { 
         setMessages([{id: 'initial-greeting', role: 'bot', text: "Hello! I'm the Xoire AI Assistant. How can I help you learn about Xoire AI today?"}]);
     }
   }
@@ -171,9 +201,9 @@ const DraggableChatbot = () => {
           </button>
           {!isMinimized && (
             <button
-                onClick={() => setIsMinimized(true)}
+                onClick={() => setIsMinimized(true)} // This now minimizes
                 className="p-1 rounded hover:bg-destructive/20 text-destructive"
-                aria-label="Close chat (Minimize)"
+                aria-label="Minimize chat" // Changed label
             >
                 <CloseIcon size={16} />
             </button>
