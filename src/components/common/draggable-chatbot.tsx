@@ -7,23 +7,20 @@ import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical } from 'lu
 const DraggableChatbot = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(true); // Changed to true for minimized by default
-  const [isShown, setIsShown] = useState(true);
+  const [isMinimized, setIsMinimized] = useState(true);
   const [initialPos, setInitialPos] = useState({ x: 0, y: 0 });
   const draggableRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    // Set initial position to bottom-right
-    // Uses the current value of isMinimized to determine initial size for positioning
     const currentWidth = isMinimized ? 60 : 350;
     const currentHeight = isMinimized ? 60 : 500;
-    const initialX = window.innerWidth - currentWidth - 20; 
+    const initialX = window.innerWidth - currentWidth - 20;
     const initialY = window.innerHeight - currentHeight - 20;
     setPosition({ x: initialX > 0 ? initialX : 0, y: initialY > 0 ? initialY : 0 });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMinimized]); // Added isMinimized here so it re-calculates if default state changes, though for initial it's fine.
+  }, [isMinimized]);
 
 
   const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
@@ -40,13 +37,13 @@ const DraggableChatbot = () => {
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging || !draggableRef.current) return;
-    e.preventDefault(); 
+    e.preventDefault();
 
     let newX = e.clientX - initialPos.x;
     let newY = e.clientY - initialPos.y;
 
     const boundaryOffset = 10;
-    newX = Math.max(-draggableRef.current.offsetWidth + 50, Math.min(newX, window.innerWidth - 50)); 
+    newX = Math.max(-draggableRef.current.offsetWidth + 50, Math.min(newX, window.innerWidth - 50));
     newY = Math.max(0, Math.min(newY, window.innerHeight - 50));
 
     setPosition({ x: newX, y: newY });
@@ -68,10 +65,11 @@ const DraggableChatbot = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging, initialPos]);
 
-  if (!isMounted || !isShown) {
-    return null; 
+  if (!isMounted) {
+    return null;
   }
 
   return (
@@ -104,9 +102,9 @@ const DraggableChatbot = () => {
             {isMinimized ? <Maximize size={14} /> : <Minus size={14} />}
           </button>
           <button
-            onClick={() => setIsShown(false)}
+            onClick={() => setIsMinimized(true)} // Changed this line
             className="p-1 rounded hover:bg-destructive/20 text-destructive"
-            aria-label="Close chat"
+            aria-label="Minimize chat" // Changed aria-label for clarity
           >
             <CloseIcon size={16} />
           </button>
@@ -119,12 +117,12 @@ const DraggableChatbot = () => {
             src="https://xoire-s-vision.vercel.app"
             title="Xoire AI Chatbot"
             className="w-full h-full border-none"
-            allow="microphone" 
+            allow="microphone"
           />
         </div>
       )}
        {isMinimized && (
-        <div 
+        <div
             className="flex-grow flex items-center justify-center cursor-pointer"
             onClick={() => setIsMinimized(false)}
             role="button"
