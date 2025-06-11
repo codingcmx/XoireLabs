@@ -20,7 +20,7 @@ export default function HeroSection() {
     offset: ["start start", "end start"],
   });
 
-  const [orbImageUrl, setOrbImageUrl] = useState(ORIGINAL_ORB_IMAGE_URL);
+  const [orbImageUrl, setOrbImageUrl] = useState("/ai-orb.png");
   const [isOrbImageLoading, setIsOrbImageLoading] = useState(true);
 
   useEffect(() => {
