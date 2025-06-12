@@ -11,10 +11,10 @@ interface System {
   id: string;
   name: string;
   description: string;
-  imageSrc: string;
+  imageSrc: string; // Fallback image if video/iframe fails or for non-video cards
   aiHintCard: string;
-  videoSrc: string;
-  videoPosterUrl: string;
+  videoSrc: string; // Can be YouTube link or direct video file URL
+  videoPosterUrl: string; // Poster for video tag
   aiHintVideo: string;
   details: {
     feature: string;
@@ -44,7 +44,7 @@ const systems: System[] = [
     description: "Intelligent process automation for complex enterprise workflows.",
     imageSrc: "https://placehold.co/600x400/0A0A23/A0A0D0.png?text=AutoNexus+Card",
     aiHintCard: "flow chart",
-    videoSrc: "https://your-video-hosting.com/path-to/autonexus-system-demo.mp4",
+    videoSrc: "https://your-video-hosting.com/path-to/autonexus-system-demo.mp4", // Placeholder for external video
     videoPosterUrl: "https://placehold.co/600x300/0A0A23/A0A0D0.png?text=AutoNexus+Video+Poster",
     aiHintVideo: "process automation flowchart",
     details: [
@@ -59,7 +59,7 @@ const systems: System[] = [
     description: "AI-driven lead discovery, qualification, and engagement engine.",
     imageSrc: "https://placehold.co/600x400/0A0A23/FFFFFF.png?text=LeadSpark+Card",
     aiHintCard: "connections network",
-    videoSrc: "https://your-video-hosting.com/path-to/leadspark-system-demo.mp4",
+    videoSrc: "https://your-video-hosting.com/path-to/leadspark-system-demo.mp4", // Placeholder for external video
     videoPosterUrl: "https://placehold.co/600x300/0A0A23/FFFFFF.png?text=LeadSpark+Video+Poster",
     aiHintVideo: "lead generation interface",
     details: [
@@ -124,7 +124,7 @@ export default function SignatureSystemsSection() {
         >
           {systems.map((system) => {
             const cardEmbedUrl = getYoutubeEmbedUrl(system.videoSrc);
-            const cardVideoId = cardEmbedUrl ? cardEmbedUrl.split('/').pop() : null;
+            const cardVideoId = cardEmbedUrl ? cardEmbedUrl.split('/').pop() : null; // Used for playlist loop
 
             return (
               <MotionDiv
@@ -144,9 +144,9 @@ export default function SignatureSystemsSection() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         data-ai-hint={system.aiHintVideo}
                       ></iframe>
-                    ) : (
+                    ) : ( // Fallback for non-YouTube or if ID extraction fails
                       <video
-                        src={system.videoSrc}
+                        src={system.videoSrc} // Direct URL
                         poster={system.videoPosterUrl || system.imageSrc}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         data-ai-hint={system.aiHintVideo}
@@ -180,9 +180,9 @@ export default function SignatureSystemsSection() {
                         </DialogHeader>
                         <div className="grid gap-6 py-4">
                           <div className="aspect-video bg-muted rounded-lg overflow-hidden border border-border">
-                            {getYoutubeEmbedUrl(system.videoSrc) ? ( // Re-check for dialog to ensure consistency
+                            {getYoutubeEmbedUrl(system.videoSrc) ? ( 
                               <iframe
-                                src={`${getYoutubeEmbedUrl(system.videoSrc)}?rel=0`} // No autoplay for dialog, show controls by default
+                                src={`${getYoutubeEmbedUrl(system.videoSrc)}?rel=0&modestbranding=1`} 
                                 title={`${system.name} Demo`}
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -192,7 +192,7 @@ export default function SignatureSystemsSection() {
                               ></iframe>
                             ) : (
                               <video
-                                src={system.videoSrc}
+                                src={system.videoSrc} // Direct URL
                                 poster={system.videoPosterUrl}
                                 className="w-full h-full object-cover"
                                 preload="metadata"

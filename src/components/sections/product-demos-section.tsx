@@ -20,7 +20,7 @@ const demos = [
     description: "Watch AutoNexus streamline a complex business process from start to finish.",
     icon: PlayCircle,
     videoPosterUrl: "https://placehold.co/1600x900/0A0A23/A0A0D0.png?text=AutoNexus+Demo+Poster",
-    videoSrc: "https://your-video-hosting.com/path-to/autonexus-demo.mp4",
+    videoSrc: "https://your-video-hosting.com/path-to/autonexus-demo.mp4", // Placeholder for external video
     aiHint: "process automation flowchart"
   },
   {
@@ -29,7 +29,7 @@ const demos = [
     description: "Discover how LeadSpark AI identifies and qualifies high-potential leads.",
     icon: Bot,
     videoPosterUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadSpark+Demo+Poster",
-    videoSrc: "https://your-video-hosting.com/path-to/leadspark-demo.mp4",
+    videoSrc: "https://your-video-hosting.com/path-to/leadspark-demo.mp4", // Placeholder for external video
     aiHint: "lead generation interface"
   },
 ];
@@ -89,7 +89,7 @@ export default function ProductDemosSection() {
         >
           {demos.map((demo) => {
             const embedUrl = getYoutubeEmbedUrl(demo.videoSrc);
-            const videoId = embedUrl ? embedUrl.split('/').pop() : null;
+            // const videoId = embedUrl ? embedUrl.split('/').pop() : null; // Not directly used for videoId in iframe params anymore
 
             return (
               <MotionDiv key={demo.id} variants={itemVariants}>
@@ -105,9 +105,9 @@ export default function ProductDemosSection() {
                   </CardHeader>
                   <CardContent className="p-6 pt-0">
                     <div className="aspect-video bg-muted rounded-lg overflow-hidden border border-border">
-                      {embedUrl && videoId ? (
+                      {embedUrl ? (
                         <iframe
-                          src={`${embedUrl}?rel=0`} // Add rel=0 to prevent related videos from showing
+                          src={`${embedUrl}?rel=0&modestbranding=1`} 
                           title={demo.title}
                           frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -122,7 +122,7 @@ export default function ProductDemosSection() {
                           className="w-full h-full object-cover"
                           preload="metadata"
                           data-ai-hint={demo.aiHint}
-                          src={demo.videoSrc}
+                          src={demo.videoSrc} // This will be the direct external link if not YouTube
                         >
                           Your browser does not support the video tag.
                         </video>
