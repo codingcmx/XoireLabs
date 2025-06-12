@@ -11,7 +11,7 @@ const demos = [
     description: "See how TradeTitan AI analyzes markets and executes trades in real-time.",
     icon: BarChart3,
     videoPosterUrl: "https://placehold.co/1600x900/0A0A23/BF40BF.png?text=TradeTitan+Demo+Poster",
-    videoSrc: "https://youtu.be/EEX0EHTTePE?si=pmXknRrayW-DgV4e", // UPDATED LINK
+    videoSrc: "https://youtu.be/EEX0EHTTePE?si=pmXknRrayW-DgV4e",
     aiHint: "financial graph animation"
   },
   {
@@ -20,7 +20,7 @@ const demos = [
     description: "Watch AutoNexus streamline a complex business process from start to finish.",
     icon: PlayCircle,
     videoPosterUrl: "https://placehold.co/1600x900/0A0A23/A0A0D0.png?text=AutoNexus+Demo+Poster",
-    videoSrc: "https://your-video-hosting.com/path-to/autonexus-demo.mp4", 
+    videoSrc: "https://your-video-hosting.com/path-to/autonexus-demo.mp4",
     aiHint: "process automation flowchart"
   },
   {
@@ -29,7 +29,7 @@ const demos = [
     description: "Discover how LeadSpark AI identifies and qualifies high-potential leads.",
     icon: Bot,
     videoPosterUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadSpark+Demo+Poster",
-    videoSrc: "https://your-video-hosting.com/path-to/leadspark-demo.mp4", 
+    videoSrc: "https://your-video-hosting.com/path-to/leadspark-demo.mp4",
     aiHint: "lead generation interface"
   },
 ];
@@ -43,6 +43,24 @@ const itemVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
+
+function getYoutubeEmbedUrl(url: string): string | null {
+  let videoId = null;
+  if (url.includes('youtu.be/')) {
+    videoId = url.split('youtu.be/')[1]?.split('?')[0];
+  } else if (url.includes('youtube.com/watch?v=')) {
+    videoId = url.split('watch?v=')[1]?.split('&')[0];
+  } else if (url.includes('youtube.com/embed/')) {
+    videoId = url.split('embed/')[1]?.split('?')[0];
+  } else if (url.includes('youtube.com/shorts/')) {
+    videoId = url.split('shorts/')[1]?.split('?')[0];
+  }
+
+  if (videoId) {
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  return null;
+}
 
 
 export default function ProductDemosSection() {
@@ -69,40 +87,55 @@ export default function ProductDemosSection() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.05 }}
         >
-          {demos.map((demo) => (
-            <MotionDiv key={demo.id} variants={itemVariants}>
-              <Card className="glassmorphic group overflow-hidden border-primary/30 hover:shadow-xl hover:shadow-primary/25 transition-all duration-300 ease-out">
-                <CardHeader className="p-6">
-                  <div className="flex items-center space-x-4 mb-2">
-                    <demo.icon className="w-10 h-10 text-primary" />
-                    <CardTitle className="text-3xl font-headline group-hover:text-primary transition-colors">{demo.title}</CardTitle>
-                  </div>
-                  <CardDescription className="text-base text-muted-foreground group-hover:text-foreground transition-colors">
-                    {demo.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6 pt-0">
-                  <div className="aspect-video bg-muted rounded-lg overflow-hidden border border-border">
-                    <video
-                        controls
-                        poster={demo.videoPosterUrl}
-                        className="w-full h-full object-cover"
-                        preload="metadata"
-                        data-ai-hint={demo.aiHint}
-                        src={demo.videoSrc} // Use the external video source
-                    >
-                        {/* You can add <source> tags here if you have multiple formats for the same video */}
-                        {/* e.g., <source src={demo.videoSrc.replace('.mp4', '.webm')} type="video/webm" /> */}
-                        Your browser does not support the video tag.
-                    </video>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Video hosted externally. Ensure the link is correct and accessible. YouTube links may require iframe embedding.
-                  </p>
-                </CardContent>
-              </Card>
-            </MotionDiv>
-          ))}
+          {demos.map((demo) => {
+            const embedUrl = getYoutubeEmbedUrl(demo.videoSrc);
+            const videoId = embedUrl ? embedUrl.split('/').pop() : null;
+
+            return (
+              <MotionDiv key={demo.id} variants={itemVariants}>
+                <Card className="glassmorphic group overflow-hidden border-primary/30 hover:shadow-xl hover:shadow-primary/25 transition-all duration-300 ease-out">
+                  <CardHeader className="p-6">
+                    <div className="flex items-center space-x-4 mb-2">
+                      <demo.icon className="w-10 h-10 text-primary" />
+                      <CardTitle className="text-3xl font-headline group-hover:text-primary transition-colors">{demo.title}</CardTitle>
+                    </div>
+                    <CardDescription className="text-base text-muted-foreground group-hover:text-foreground transition-colors">
+                      {demo.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-6 pt-0">
+                    <div className="aspect-video bg-muted rounded-lg overflow-hidden border border-border">
+                      {embedUrl && videoId ? (
+                        <iframe
+                          src={`${embedUrl}?rel=0`} // Add rel=0 to prevent related videos from showing
+                          title={demo.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          className="w-full h-full object-cover"
+                          data-ai-hint={demo.aiHint}
+                        ></iframe>
+                      ) : (
+                        <video
+                          controls
+                          poster={demo.videoPosterUrl}
+                          className="w-full h-full object-cover"
+                          preload="metadata"
+                          data-ai-hint={demo.aiHint}
+                          src={demo.videoSrc}
+                        >
+                          Your browser does not support the video tag.
+                        </video>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      {embedUrl ? "Video embedded from YouTube." : "Video hosted externally. Ensure the link is correct and accessible."}
+                    </p>
+                  </CardContent>
+                </Card>
+              </MotionDiv>
+            );
+          })}
         </MotionDiv>
       </div>
     </section>
