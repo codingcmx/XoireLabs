@@ -6,7 +6,7 @@ import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical, Send, Loa
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { xoireChat, type XoireChatInput, type XoireChatOutput } from '@/ai/flows/xoire-chat-flow';
+// import { xoireChat, type XoireChatInput, type XoireChatOutput } from '@/ai/flows/xoire-chat-flow'; // Assuming external for now
 import type { MessageData } from 'genkit';
 
 interface ChatMessage {
@@ -14,6 +14,16 @@ interface ChatMessage {
   role: 'user' | 'bot';
   text: string;
 }
+
+// Simulate the types if xoireChat is external for now
+interface XoireChatInput {
+  message: string;
+  history?: MessageData[];
+}
+interface XoireChatOutput {
+  response: string;
+}
+
 
 const DraggableChatbot = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -27,20 +37,27 @@ const DraggableChatbot = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const dragOccurredRef = useRef(false);
+
 
   useEffect(() => {
     setIsMounted(true);
-    const currentWidth = isMinimized ? 60 : 380;
-    const currentHeight = isMinimized ? 60 : 550;
-    const initialX = window.innerWidth - currentWidth - 20;
-    const initialY = window.innerHeight - currentHeight - 20;
-    setPosition({ x: initialX > 0 ? initialX : 0, y: initialY > 0 ? initialY : 0 });
+    // Initial positioning logic
+    const placeChatbot = () => {
+      if (!draggableRef.current) return;
+      const currentWidth = isMinimized ? 60 : 380;
+      const currentHeight = isMinimized ? 60 : 550;
+      const initialX = window.innerWidth - currentWidth - 20;
+      const initialY = window.innerHeight - currentHeight - 20;
+      setPosition({ x: initialX > 0 ? initialX : 0, y: initialY > 0 ? initialY : 0 });
+    };
+    placeChatbot(); // Call on mount and when isMinimized changes
 
     if (!isMinimized && messages.length === 0) {
       setMessages([{id: 'initial-greeting', role: 'bot', text: "Hello! I'm the Xoire AI Assistant. How can I help you learn about Xoire AI today?"}]);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMinimized, isMounted]);
+  }, [isMinimized, isMounted]); // Removed messages.length from deps to avoid re-greeting on send
 
 
   useEffect(() => {
@@ -51,33 +68,54 @@ const DraggableChatbot = () => {
 
 
   const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
-    if (!draggableRef.current || e.target instanceof HTMLButtonElement || (e.target as HTMLElement).closest('button') || e.target instanceof HTMLInputElement || (e.target as HTMLElement).closest('input')) {
-      return;
+    if (!draggableRef.current) return;
+
+    // Prevent drag initiation if clicking on interactive elements within the header (buttons for min/close)
+    // This check is primarily for the expanded state.
+    if (!isMinimized) {
+      const targetIsInteractiveInHeader =
+        e.target instanceof HTMLButtonElement ||
+        (e.target as HTMLElement).closest('button');
+      if (targetIsInteractiveInHeader) {
+        return;
+      }
     }
+
     setIsDragging(true);
     const rect = draggableRef.current.getBoundingClientRect();
     setInitialPos({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     });
+    dragOccurredRef.current = false; // Reset for this interaction
   };
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging || !draggableRef.current) return;
     e.preventDefault();
+    dragOccurredRef.current = true; // A drag movement happened
 
     let newX = e.clientX - initialPos.x;
     let newY = e.clientY - initialPos.y;
 
-    const boundaryOffset = 10;
-    newX = Math.max(-draggableRef.current.offsetWidth + 50, Math.min(newX, window.innerWidth - 50));
-    newY = Math.max(0, Math.min(newY, window.innerHeight - 50));
+    // Boundary checks (ensure chat window stays somewhat visible)
+    const currentWidth = draggableRef.current.offsetWidth;
+    const currentHeight = draggableRef.current.offsetHeight;
+    const safetyMargin = 50; // How much of the chatbot must remain visible
+
+    newX = Math.max(-currentWidth + safetyMargin, Math.min(newX, window.innerWidth - safetyMargin));
+    newY = Math.max(0, Math.min(newY, window.innerHeight - safetyMargin));
+
 
     setPosition({ x: newX, y: newY });
   };
 
   const handleMouseUp = () => {
-    setIsDragging(false);
+    if (isDragging) {
+      setIsDragging(false);
+    }
+    // dragOccurredRef.current is now set if a drag happened.
+    // It will be reset on the next mousedown.
   };
 
   useEffect(() => {
@@ -93,7 +131,7 @@ const DraggableChatbot = () => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDragging, initialPos]);
+  }, [isDragging, initialPos]); 
 
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -104,28 +142,44 @@ const DraggableChatbot = () => {
     setMessages(prev => [...prev, newUserMessage]);
     setInputValue('');
     setIsLoading(true);
-
-    // Prepare history for Genkit flow
-    // Map 'bot' role to 'model' role
-    const historyForGenkit: MessageData[] = messages
-      .filter(msg => msg.id !== 'initial-greeting') // Exclude initial greeting
+    
+    const historyForAPI: MessageData[] = messages
+      .filter(msg => msg.id !== 'initial-greeting')
       .map(msg => ({
-        role: msg.role === 'bot' ? 'model' : 'user',
+        role: msg.role === 'bot' ? 'model' : 'user', 
         parts: [{ text: msg.text }],
     }));
 
     const input: XoireChatInput = {
       message: userMessageText,
-      history: historyForGenkit,
+      history: historyForAPI,
     };
 
     try {
-      const result: XoireChatOutput = await xoireChat(input);
+      const externalApiUrl = "https://jsonplaceholder.typicode.com/posts"; // Placeholder
+      
+      const response = await fetch(externalApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(input),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Failed to parse error response" }));
+        throw new Error(errorData.message || `API request failed with status ${response.status}`);
+      }
+      
+      const apiResult = await response.json();
+      const result: XoireChatOutput = { response: apiResult.title || "Placeholder response from external API" };
+
+
       const botResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: result.response };
       setMessages(prev => [...prev, botResponse]);
 
     } catch (error) {
-      console.error("Error calling xoireChat flow:", error);
+      console.error("Error calling external chatbot API:", error);
       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred with the AI chat.";
       const errorResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: `Error: ${errorMessage}` };
       setMessages(prev => [...prev, errorResponse]);
@@ -135,11 +189,20 @@ const DraggableChatbot = () => {
   };
   
   const toggleMinimize = () => {
-    setIsMinimized(!isMinimized);
-    if (isMinimized && messages.length === 0) { 
-        setMessages([{id: 'initial-greeting', role: 'bot', text: "Hello! I'm the Xoire AI Assistant. How can I help you learn about Xoire AI today?"}]);
+    setIsMinimized(prevMinimized => {
+        const nextMinimized = !prevMinimized;
+        if (!nextMinimized && messages.length === 0) { 
+            setMessages([{id: 'initial-greeting', role: 'bot', text: "Hello! I'm the Xoire AI Assistant. How can I help you learn about Xoire AI today?"}]);
+        }
+        return nextMinimized;
+    });
+  };
+
+  const handleMinimizedClickOrKey = () => {
+    if (!dragOccurredRef.current) {
+        toggleMinimize();
     }
-  }
+  };
 
   if (!isMounted) {
     return null;
@@ -148,7 +211,9 @@ const DraggableChatbot = () => {
   return (
     <div
       ref={draggableRef}
-      className={`fixed z-[9999] bg-card shadow-2xl rounded-lg border border-primary/50 flex flex-col transition-all duration-300 ease-out ${isDragging ? 'cursor-grabbing' : 'cursor-default'}`}
+      className={`fixed z-[9999] bg-card shadow-2xl rounded-lg border border-primary/50 flex flex-col transition-all duration-300 ease-out ${
+        isDragging ? 'cursor-grabbing' : '' 
+      }`}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
@@ -157,8 +222,10 @@ const DraggableChatbot = () => {
       }}
     >
       <div
-        className={`flex items-center justify-between p-2 bg-primary/10 border-b border-primary/30 ${!isMinimized && 'cursor-grab'}`}
-        onMouseDown={!isMinimized ? handleMouseDown : undefined}
+        className={`flex items-center justify-between p-2 bg-primary/10 border-b border-primary/30 ${
+          !isMinimized && !isDragging ? 'cursor-grab' : '' 
+        }`}
+        onMouseDown={!isMinimized ? handleMouseDown : undefined} 
       >
         <div className="flex items-center text-primary select-none">
           {!isMinimized && <GripVertical size={18} className="mr-1 text-primary/50" />}
@@ -167,7 +234,7 @@ const DraggableChatbot = () => {
         </div>
         <div className="flex items-center space-x-1">
           <button
-            onClick={toggleMinimize}
+            onClick={toggleMinimize} 
             className="p-1 rounded hover:bg-primary/20 text-primary"
             aria-label={isMinimized ? "Expand chat" : "Minimize chat"}
           >
@@ -175,9 +242,9 @@ const DraggableChatbot = () => {
           </button>
           {!isMinimized && (
             <button
-                onClick={() => setIsMinimized(true)}
+                onClick={() => setIsMinimized(true)} 
                 className="p-1 rounded hover:bg-destructive/20 text-destructive"
-                aria-label="Minimize chat"
+                aria-label="Close chat (minimize)" 
             >
                 <CloseIcon size={16} />
             </button>
@@ -238,12 +305,15 @@ const DraggableChatbot = () => {
       )}
        {isMinimized && (
         <div
-            className="flex-grow flex items-center justify-center cursor-pointer"
-            onClick={toggleMinimize}
+            className={`flex-grow flex items-center justify-center ${
+              !isDragging ? 'cursor-grab' : '' 
+            }`}
+            onClick={handleMinimizedClickOrKey}
+            onMouseDown={handleMouseDown} 
             role="button"
             tabIndex={0}
             aria-label="Expand chat"
-            onKeyDown={(e) => e.key === 'Enter' && toggleMinimize()}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleMinimizedClickOrKey()}
         >
             <MessageSquare size={24} className="text-primary animate-pulse" />
         </div>
@@ -254,4 +324,4 @@ const DraggableChatbot = () => {
 
 export default DraggableChatbot;
 
-    
+      
