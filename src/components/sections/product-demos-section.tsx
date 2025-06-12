@@ -11,7 +11,7 @@ const demos = [
     description: "See how TradeTitan AI analyzes markets and executes trades in real-time.",
     icon: BarChart3,
     videoPosterUrl: "https://placehold.co/1600x900/0A0A23/BF40BF.png?text=TradeTitan+Demo+Poster",
-    videoSrc: "https://your-video-hosting.com/path-to/tradetitan-demo.mp4", // REPLACE THIS URL
+    videoSrc: "https://youtu.be/EEX0EHTTePE?si=pmXknRrayW-DgV4e", // UPDATED LINK
     aiHint: "financial graph animation"
   },
   {
@@ -20,7 +20,7 @@ const demos = [
     description: "Watch AutoNexus streamline a complex business process from start to finish.",
     icon: PlayCircle,
     videoPosterUrl: "https://placehold.co/1600x900/0A0A23/A0A0D0.png?text=AutoNexus+Demo+Poster",
-    videoSrc: "https://your-video-hosting.com/path-to/autonexus-demo.mp4", // REPLACE THIS URL
+    videoSrc: "https://your-video-hosting.com/path-to/autonexus-demo.mp4", 
     aiHint: "process automation flowchart"
   },
   {
@@ -29,7 +29,7 @@ const demos = [
     description: "Discover how LeadSpark AI identifies and qualifies high-potential leads.",
     icon: Bot,
     videoPosterUrl: "https://placehold.co/1600x900/0A0A23/FFFFFF.png?text=LeadSpark+Demo+Poster",
-    videoSrc: "https://your-video-hosting.com/path-to/leadspark-demo.mp4", // REPLACE THIS URL
+    videoSrc: "https://your-video-hosting.com/path-to/leadspark-demo.mp4", 
     aiHint: "lead generation interface"
   },
 ];
@@ -97,7 +97,7 @@ export default function ProductDemosSection() {
                     </video>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Video hosted externally. Ensure the link is correct and accessible.
+                    Video hosted externally. Ensure the link is correct and accessible. YouTube links may require iframe embedding.
                   </p>
                 </CardContent>
               </Card>

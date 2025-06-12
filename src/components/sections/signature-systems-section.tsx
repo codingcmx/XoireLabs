@@ -29,7 +29,7 @@ const systems: System[] = [
     description: "Automated high-frequency trading bot with adaptive learning algorithms.",
     imageSrc: "https://placehold.co/600x400/0A0A23/BF40BF.png?text=TradeTitan+Card", 
     aiHintCard: "trading graph", 
-    videoSrc: "https://your-video-hosting.com/path-to/tradetitan-system-demo.mp4", // REPLACE THIS URL
+    videoSrc: "https://youtu.be/EEX0EHTTePE?si=pmXknRrayW-DgV4e", // UPDATED LINK
     videoPosterUrl: "https://placehold.co/600x300/0A0A23/BF40BF.png?text=TradeTitan+Video+Poster", 
     aiHintVideo: "financial graph animation",
     details: [
@@ -44,7 +44,7 @@ const systems: System[] = [
     description: "Intelligent process automation for complex enterprise workflows.",
     imageSrc: "https://placehold.co/600x400/0A0A23/A0A0D0.png?text=AutoNexus+Card", 
     aiHintCard: "flow chart", 
-    videoSrc: "https://your-video-hosting.com/path-to/autonexus-system-demo.mp4", // REPLACE THIS URL
+    videoSrc: "https://your-video-hosting.com/path-to/autonexus-system-demo.mp4", 
     videoPosterUrl: "https://placehold.co/600x300/0A0A23/A0A0D0.png?text=AutoNexus+Video+Poster", 
     aiHintVideo: "process automation flowchart",
     details: [
@@ -59,7 +59,7 @@ const systems: System[] = [
     description: "AI-driven lead discovery, qualification, and engagement engine.", 
     imageSrc: "https://placehold.co/600x400/0A0A23/FFFFFF.png?text=LeadSpark+Card", 
     aiHintCard: "connections network", 
-    videoSrc: "https://your-video-hosting.com/path-to/leadspark-system-demo.mp4", // REPLACE THIS URL
+    videoSrc: "https://your-video-hosting.com/path-to/leadspark-system-demo.mp4", 
     videoPosterUrl: "https://placehold.co/600x300/0A0A23/FFFFFF.png?text=LeadSpark+Video+Poster", 
     aiHintVideo: "lead generation interface",
     details: [
@@ -124,7 +124,7 @@ export default function SignatureSystemsSection() {
                     playsInline
                     preload="metadata" 
                   >
-                    Your browser does not support the video tag.
+                    Your browser does not support the video tag. YouTube links may require iframe embedding.
                   </video>
                 </CardHeader>
                 <CardContent className="p-6 flex-grow">
@@ -155,7 +155,7 @@ export default function SignatureSystemsSection() {
                             data-ai-hint={system.aiHintVideo}
                             controls // Keep controls in dialog for user interaction
                           >
-                            Your browser does not support the video tag.
+                            Your browser does not support the video tag. YouTube links may require iframe embedding.
                           </video>
                         </div>
                         <div>
