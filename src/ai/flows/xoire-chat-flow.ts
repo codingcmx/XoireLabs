@@ -10,7 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import type { MessageData, MessageDataPart } from 'genkit';
+import type { MessageData } from 'genkit';
 
 
 // Define the knowledge base and system instructions for the chatbot
@@ -87,7 +87,7 @@ Interaction Guidelines:
 const XoireChatInputSchema = z.object({
   message: z.string().describe("The user's current message to the chatbot."),
   history: z.array(z.object({
-    role: z.enum(['user', 'model']),
+    role: z.enum(['user', 'model']), // Genkit uses 'model' for AI responses
     parts: z.array(z.object({text: z.string()}))
   })).optional().describe('Previous conversation history, alternating between user and model.'),
 });
@@ -114,14 +114,22 @@ const xoireChatFlow = ai.defineFlow(
     if (input.history) {
       conversationMessages.push(...input.history);
     }
+    // Add the current user message to the conversation history
     conversationMessages.push({ role: 'user', parts: [{ text: input.message }] });
+
+    // DEBUG: Log the exact payload being sent to ai.generate
+    console.log('DEBUG: Sending to ai.generate:', JSON.stringify({ 
+      prompt: conversationMessages, 
+      system: systemInstructions, // Note: system instructions might be very long for console output here
+      config: { temperature: 0.3 } 
+    }, null, 2));
 
     try {
       const genkitResponse = await ai.generate({
-        prompt: conversationMessages, // Pass the conversation history and current message
-        system: systemInstructions, // Pass the knowledge base and system role instructions
+        prompt: conversationMessages, 
+        system: systemInstructions, 
         config: {
-          temperature: 0.3,
+          temperature: 0.3, 
         },
       });
       

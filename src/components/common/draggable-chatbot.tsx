@@ -6,19 +6,14 @@ import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical, Send, Loa
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-// Removed import for xoireChat Genkit flow
-// import { xoireChat, type XoireChatInput, type XoireChatOutput } from '@/ai/flows/xoire-chat-flow';
-// import type { MessageData } from 'genkit'; // No longer needed if not using Genkit types directly for history
+import { xoireChat, type XoireChatInput, type XoireChatOutput } from '@/ai/flows/xoire-chat-flow';
+import type { MessageData } from 'genkit';
 
 interface ChatMessage {
   id: string;
-  role: 'user' | 'bot'; // Changed 'model' back to 'bot' for UI consistency if external API uses 'bot'
+  role: 'user' | 'bot';
   text: string;
 }
-
-// Placeholder for the external chatbot API endpoint
-const EXTERNAL_CHATBOT_API_URL = "YOUR_EXTERNAL_CHATBOT_API_ENDPOINT_HERE";
-// Example: const EXTERNAL_CHATBOT_API_URL = "https://your-chatbot-brain.com/api/chat";
 
 const DraggableChatbot = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -105,54 +100,33 @@ const DraggableChatbot = () => {
     const userMessageText = inputValue.trim();
     if (!userMessageText || isLoading) return;
 
-    if (EXTERNAL_CHATBOT_API_URL === "YOUR_EXTERNAL_CHATBOT_API_ENDPOINT_HERE") {
-        alert("Please configure the EXTERNAL_CHATBOT_API_URL in DraggableChatbot.tsx");
-        setIsLoading(false);
-        return;
-    }
-
     const newUserMessage: ChatMessage = { id: Date.now().toString(), role: 'user', text: userMessageText };
     setMessages(prev => [...prev, newUserMessage]);
     setInputValue('');
     setIsLoading(true);
 
-    // Prepare history for the external API
-    // This assumes your external API expects history in a similar format. Adjust if needed.
-    const historyForAPI = messages
-      .filter(msg => msg.id !== 'initial-greeting') 
+    // Prepare history for Genkit flow
+    // Map 'bot' role to 'model' role
+    const historyForGenkit: MessageData[] = messages
+      .filter(msg => msg.id !== 'initial-greeting') // Exclude initial greeting
       .map(msg => ({
-        role: msg.role, // Use 'user' or 'bot' as defined in ChatMessage
-        text: msg.text,
+        role: msg.role === 'bot' ? 'model' : 'user',
+        parts: [{ text: msg.text }],
     }));
 
+    const input: XoireChatInput = {
+      message: userMessageText,
+      history: historyForGenkit,
+    };
+
     try {
-      // Call the external chatbot API
-      const response = await fetch(EXTERNAL_CHATBOT_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessageText,
-          history: historyForAPI, // Send conversation history
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ detail: "Unknown error from external API" }));
-        throw new Error(errorData.detail || `External API Error: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      
-      // Assuming the external API returns a response in a field like 'response' or 'text'
-      const botResponseText = result.response || result.text || "Sorry, I didn't get a valid response.";
-      const botResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: botResponseText };
+      const result: XoireChatOutput = await xoireChat(input);
+      const botResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: result.response };
       setMessages(prev => [...prev, botResponse]);
 
     } catch (error) {
-      console.error("Error calling external chatbot API:", error);
-      const errorMessage = error instanceof Error ? error.message : "Could not connect to the chatbot.";
+      console.error("Error calling xoireChat flow:", error);
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred with the AI chat.";
       const errorResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: `Error: ${errorMessage}` };
       setMessages(prev => [...prev, errorResponse]);
     } finally {
@@ -201,9 +175,9 @@ const DraggableChatbot = () => {
           </button>
           {!isMinimized && (
             <button
-                onClick={() => setIsMinimized(true)} // This now minimizes
+                onClick={() => setIsMinimized(true)}
                 className="p-1 rounded hover:bg-destructive/20 text-destructive"
-                aria-label="Minimize chat" // Changed label
+                aria-label="Minimize chat"
             >
                 <CloseIcon size={16} />
             </button>
@@ -279,3 +253,5 @@ const DraggableChatbot = () => {
 };
 
 export default DraggableChatbot;
+
+    
