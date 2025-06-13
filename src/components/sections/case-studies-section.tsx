@@ -56,9 +56,9 @@ const initialTestimonials: Testimonial[] = [
 const duplicatedTestimonials = [...initialTestimonials, ...initialTestimonials];
 
 const stats = [
-    { value: "$7.4M+", label: "Automated Annually", icon: TrendingUp, color: "text-primary" },
+    { value: "$147K+", label: "Automated Annually", icon: TrendingUp, color: "text-primary" },
     { value: "98%", label: "Client Satisfaction", icon: Star, color: "text-accent" },
-    { value: "150+", label: "AI Systems Deployed", icon: Users, color: "text-primary" },
+    { value: "97+", label: "AI Systems Deployed", icon: Users, color: "text-primary" },
 ];
 
 const sectionVariants = {
