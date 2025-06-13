@@ -14,6 +14,7 @@ const navItemsBase = [
   { label: 'Industries', href: '/#industries' },
   { label: 'Why Xoire', href: '/why-xoire' }, 
   { label: 'FAQs', href: '/#faq' },
+  { label: 'Chatbot', href: '/chatbot' }, // Added Chatbot link
   { label: 'Book Meeting', href: '/book-meeting' }, 
 ];
 
