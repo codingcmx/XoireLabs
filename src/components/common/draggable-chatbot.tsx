@@ -7,12 +7,13 @@ import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical } from 'lu
 const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant.vercel.app";
 
 const DraggableChatbot = () => {
-  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [position, setPosition] = useState<{ x: number; y: number }>({ x: -9999, y: -9999 }); // Initial off-screen
   const [isDragging, setIsDragging] = useState(false);
   const [isMinimized, setIsMinimized] = useState(true);
   const [initialPos, setInitialPos] = useState({ x: 0, y: 0 });
   const draggableRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isReady, setIsReady] = useState(false); // New state for visibility control
   const dragOccurredRef = useRef(false);
 
   useEffect(() => {
@@ -23,60 +24,49 @@ const DraggableChatbot = () => {
     if (!isMounted) return;
 
     const placeChatbot = () => {
-      // Removed problematic `if (!draggableRef.current) return;` check for initial placement
-      // currentWidth and currentHeight for initial placement are derived from isMinimized state, not the ref.
       const currentWidth = isMinimized ? 60 : 380;
-      const currentHeight = isMinimized ? 60 : 550; 
-      const initialX = window.innerWidth - currentWidth - 20;
-      const initialY = window.innerHeight - currentHeight - 20;
-      setPosition({ x: initialX > 0 ? initialX : 0, y: initialY > 0 ? initialY : 0 });
+      const currentHeight = isMinimized ? 60 : 550;
+      const targetX = window.innerWidth - currentWidth - 20;
+      const targetY = window.innerHeight - currentHeight - 20;
+
+      setPosition({ x: Math.max(0, targetX), y: Math.max(0, targetY) });
+      if (!isReady) { // Set ready only once after initial placement
+        setIsReady(true);
+      }
     };
 
-    placeChatbot(); // Set initial position
-    window.addEventListener('resize', placeChatbot); // Reposition on resize
+    placeChatbot();
+    window.addEventListener('resize', placeChatbot);
 
     return () => {
       window.removeEventListener('resize', placeChatbot);
     };
-  }, [isMinimized, isMounted]);
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMinimized, isMounted]); // isReady is intentionally not here to avoid loop on setIsReady
 
   const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
-    if (!draggableRef.current || !position) return;
+    if (!draggableRef.current) return;
 
     const targetIsButton = (e.target as HTMLElement).closest('button');
     if (targetIsButton) {
-      return; 
+      return;
     }
     
     setIsDragging(true);
-    setInitialPos({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
+    // Ensure position is read from the state for initialPos calculation
+    // This is to prevent using stale position data if a re-render hasn't completed
+    setPosition(currentPos => {
+      setInitialPos({
+        x: e.clientX - currentPos.x,
+        y: e.clientY - currentPos.y,
+      });
+      return currentPos; // No change to position here, just reading it
     });
+
     dragOccurredRef.current = false;
     if (draggableRef.current) {
       draggableRef.current.style.willChange = 'transform';
     }
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging || !draggableRef.current || !position) return; // Added !position check
-    e.preventDefault();
-    dragOccurredRef.current = true;
-
-    let newX = e.clientX - initialPos.x;
-    let newY = e.clientY - initialPos.y;
-
-    const currentWidth = draggableRef.current.offsetWidth;
-    const currentHeight = draggableRef.current.offsetHeight;
-    const safetyMargin = 50; // Keep chatbot somewhat on screen
-
-    // Prevent dragging too far off-screen
-    newX = Math.max(-currentWidth + safetyMargin, Math.min(newX, window.innerWidth - safetyMargin));
-    newY = Math.max(0, Math.min(newY, window.innerHeight - safetyMargin)); // Allow pinning to top, but not above
-
-    setPosition({ x: newX, y: newY });
   };
 
   const handleMouseUp = () => {
@@ -89,22 +79,41 @@ const DraggableChatbot = () => {
   };
 
   useEffect(() => {
+    // Memoize handlers or define them inside if they don't depend on too much changing state
+    const currentHandleMouseMove = (e: MouseEvent) => {
+        if (!isDragging || !draggableRef.current) return;
+        e.preventDefault();
+        dragOccurredRef.current = true;
+
+        let newX = e.clientX - initialPos.x;
+        let newY = e.clientY - initialPos.y;
+
+        const currentWidth = draggableRef.current.offsetWidth;
+        const currentHeight = draggableRef.current.offsetHeight;
+        const safetyMargin = 50;
+
+        newX = Math.max(-currentWidth + safetyMargin, Math.min(newX, window.innerWidth - safetyMargin));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - safetyMargin));
+
+        setPosition({ x: newX, y: newY });
+    };
+    
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mousemove', currentHandleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     } else {
-      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mousemove', currentHandleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     }
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mousemove', currentHandleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDragging, initialPos, position]); // Added position to dependencies as it's used in handleMouseMove via closure
+  }, [isDragging, initialPos]); // Depends on isDragging and the stable initialPos for the drag
 
   const toggleMinimize = () => {
     setIsMinimized(prevMinimized => !prevMinimized);
+    // Position will be re-calculated by the other useEffect due to isMinimized change
   };
 
   const handleMinimizedClickOrKey = () => {
@@ -113,22 +122,25 @@ const DraggableChatbot = () => {
     }
   };
   
-  if (!isMounted || position === null) {
+  if (!isMounted) { // Still wait for mount to ensure window object is available
     return null; 
   }
 
   return (
     <div
       ref={draggableRef}
-      className={`fixed z-[9999] bg-card shadow-2xl rounded-lg border border-primary/50 flex flex-col transition-all duration-300 ease-out ${
+      className={`fixed z-[9999] bg-card shadow-2xl rounded-lg border border-primary/50 flex flex-col ease-out ${
         isDragging ? 'cursor-grabbing' : '' 
       }`}
       style={{
         transform: `translate(${position.x}px, ${position.y}px)`,
         width: isMinimized ? '60px' : '380px',
         height: isMinimized ? '60px' : '550px',
-        opacity: 1, // When rendered, opacity is 1. The null check above handles visibility.
-        willChange: isDragging ? 'transform' : 'auto',
+        opacity: isReady ? 1 : 0,
+        pointerEvents: isReady ? 'auto' : 'none',
+        willChange: isDragging ? 'transform' : (isReady ? 'opacity' : 'auto'), // Hint for opacity fade-in
+        transitionProperty: 'width, height, opacity', // Explicit transitions
+        transitionDuration: '300ms',
       }}
     >
       <div
