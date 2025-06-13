@@ -3,8 +3,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import MotionDiv from '@/components/motion/motion-div';
-import { Star, TrendingUp, Users } from 'lucide-react';
-// Removed useState and useEffect for previous rotation logic
+import { Star, TrendingUp, Users, StarHalf } from 'lucide-react'; // Added StarHalf
 
 interface Testimonial {
   quote: string;
@@ -12,6 +11,7 @@ interface Testimonial {
   company: string;
   avatar: string;
   aiHint: string;
+  rating: number; // Added rating
 }
 
 const initialTestimonials: Testimonial[] = [
@@ -21,6 +21,7 @@ const initialTestimonials: Testimonial[] = [
     company: "CEO, QuantumLeap Tech",
     avatar: "https://placehold.co/100x100/BF40BF/0A0A23.png?text=ER",
     aiHint: "woman portrait",
+    rating: 5,
   },
   {
     quote: "The AI trading bot developed by Xoire has consistently outperformed market benchmarks. Their expertise is unparalleled.",
@@ -28,6 +29,7 @@ const initialTestimonials: Testimonial[] = [
     company: "Founder, Apex Capital",
     avatar: "https://placehold.co/100x100/A0A0D0/0A0A23.png?text=MC",
     aiHint: "man portrait",
+    rating: 4.5,
   },
   {
     quote: "Our customer engagement skyrocketed after implementing Xoire's AI chatbot solution. Support costs are down, satisfaction is up.",
@@ -35,20 +37,23 @@ const initialTestimonials: Testimonial[] = [
     company: "CMO, NovaRetail Group",
     avatar: "https://placehold.co/100x100/FFFFFF/0A0A23.png?text=LH",
     aiHint: "woman face",
+    rating: 5,
   },
    {
     quote: "The predictive analytics from Xoire gave us a clear edge. We've seen a 25% increase in conversion rates.",
     name: "Kenji Tanaka",
     company: "Head of Growth, FutureScope Inc.",
-    avatar: "https://placehold.co/100x100/FFD700/0A0A23.png?text=KT", // Gold accent
+    avatar: "https://placehold.co/100x100/FFD700/0A0A23.png?text=KT",
     aiHint: "asian man",
+    rating: 4,
   },
   {
     quote: "Xoire's team is brilliant. They delivered a complex AI system ahead of schedule and exceeding all expectations.",
     name: "Sofia Al-Jamil",
     company: "CTO, Innovate Solutions",
-    avatar: "https://placehold.co/100x100/00CED1/0A0A23.png?text=SA", // Dark turquoise accent
+    avatar: "https://placehold.co/100x100/00CED1/0A0A23.png?text=SA",
     aiHint: "middle eastern woman",
+    rating: 4.5,
   },
 ];
 
@@ -66,7 +71,7 @@ const sectionVariants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.2, duration: 0.5 } },
 };
 
-const itemVariants = { // Kept for stats cards
+const itemVariants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] } },
 };
@@ -134,9 +139,16 @@ export default function CaseStudiesSection() {
                     <p className="text-muted-foreground italic">&quot;{testimonial.quote}&quot;</p>
                   </CardContent>
                   <div className="flex mt-4">
-                      {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-5 w-5 text-primary fill-primary" />
-                      ))}
+                      {[...Array(5)].map((_, i) => {
+                        const starValue = i + 1;
+                        if (testimonial.rating >= starValue) {
+                          return <Star key={i} className="h-5 w-5 text-primary fill-primary" />;
+                        } else if (testimonial.rating >= starValue - 0.5) {
+                          return <StarHalf key={i} className="h-5 w-5 text-primary fill-primary" />;
+                        } else {
+                          return <Star key={i} className="h-5 w-5 text-primary" />; // Empty star (outline)
+                        }
+                      })}
                   </div>
                 </Card>
               </div>
@@ -147,4 +159,3 @@ export default function CaseStudiesSection() {
     </section>
   );
 }
-
