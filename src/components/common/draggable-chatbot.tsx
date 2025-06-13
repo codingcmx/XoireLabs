@@ -6,8 +6,8 @@ import { BotMessageSquare, X, Maximize2, Minimize2, MessageSquare, RotateCcw } f
 import { cn } from '@/lib/utils';
 
 // Define the external chatbot URL here
-const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant.vercel.app";
-// const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant-codingcmxs-projects.vercel.app";
+const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant-git-main-codingcmxs-projects.vercel.app";
+// const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant.vercel.app";
 // const EXTERNAL_CHATBOT_URL = ""; // Example: Set to an empty string to show placeholder
 // const EXTERNAL_CHATBOT_URL = "https://your-external-chatbot-url.com"; // Placeholder for user
 
@@ -32,8 +32,6 @@ const DraggableChatbot = () => {
   const draggableRef = useRef<HTMLDivElement>(null);
 
   const placeChatbot = () => {
-    if (!draggableRef.current) return;
-
     const currentWidth = isMinimized ? MINIMIZED_WIDTH : EXPANDED_WIDTH;
     const currentHeight = isMinimized ? MINIMIZED_HEIGHT : EXPANDED_HEIGHT;
     
@@ -50,7 +48,7 @@ const DraggableChatbot = () => {
     placeChatbot(); // Initial placement
     window.addEventListener('resize', placeChatbot);
     return () => window.removeEventListener('resize', placeChatbot);
-  }, [isMinimized, isReady]); // Re-run on minimize/expand and after initial ready
+  }, [isMinimized]); // Re-run on minimize/expand
 
   const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
     if (!draggableRef.current) return;
@@ -104,7 +102,6 @@ const DraggableChatbot = () => {
 
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
-    // No need to call placeChatbot here, useEffect dependency on isMinimized will handle it
   };
   
   const handleReloadIframe = () => {
@@ -135,8 +132,8 @@ const DraggableChatbot = () => {
         "fixed z-[9999] bg-card text-card-foreground rounded-lg shadow-2xl border border-primary/30 overflow-hidden transition-all duration-300 ease-in-out",
         isDragging && "cursor-grabbing shadow-primary/50 scale-105",
         !isDragging && "cursor-grab",
-        isMinimized ? "p-0" : "p-0", // Keep p-0 to let header/content manage padding
-        isReady ? "opacity-100" : "opacity-0 pointer-events-none" // Control visibility
+        isMinimized ? "p-0" : "p-0", 
+        isReady ? "opacity-100" : "opacity-0 pointer-events-none" 
       )}
       style={{
         left: `${position.x}px`,
@@ -146,16 +143,16 @@ const DraggableChatbot = () => {
       }}
       onMouseDown={handleMouseDown}
       onKeyDown={handleKeyDown}
-      tabIndex={0} // Make it focusable for Esc key
+      tabIndex={0} 
       aria-label={isMinimized ? "Open AI Assistant" : "AI Assistant Window"}
-      role="dialog" // More appropriate role for a modal-like window
+      role="dialog" 
       aria-modal={!isMinimized}
     >
       {/* Header Bar */}
       <div 
         className={cn(
           "chatbot-drag-handle h-12 bg-primary text-primary-foreground flex items-center justify-between px-3 select-none cursor-inherit",
-          isMinimized && "rounded-lg" // Keep rounded when minimized
+          isMinimized && "rounded-lg" 
         )}
       >
         {isMinimized ? (
@@ -190,7 +187,7 @@ const DraggableChatbot = () => {
                 {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
               </button>
                <button 
-                onClick={toggleMinimize} // Or a close function if different from minimize
+                onClick={toggleMinimize} 
                 className="p-1.5 hover:bg-red-500/80 rounded-md transition-colors" 
                 aria-label="Close Chatbot"
                 title="Close Chatbot"
@@ -230,3 +227,4 @@ const DraggableChatbot = () => {
 };
 
 export default DraggableChatbot;
+
