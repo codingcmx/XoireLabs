@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react'; 
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-// Removed DraggableChatbot import
+import DraggableChatbot from '@/components/common/draggable-chatbot'; // Import the DraggableChatbot
 
 export const metadata: Metadata = {
   title: 'Xoire AI: The 5th Dimension',
@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         {children}
         <Toaster />
-        {/* Removed DraggableChatbot component here */}
+        <DraggableChatbot /> {/* Add the DraggableChatbot here */}
       </body>
     </html>
   );
