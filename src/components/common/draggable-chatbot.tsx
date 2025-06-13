@@ -7,7 +7,7 @@ import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical } from 'lu
 // Removed FormEvent, xoireChat types, MessageData
 
 // Placeholder for the external chatbot URL - REPLACE THIS WITH YOUR ACTUAL URL
-const EXTERNAL_CHATBOT_URL = "https://your-external-chatbot-url.com";
+const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant.vercel.app";
 
 const DraggableChatbot = () => {
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
@@ -165,7 +165,7 @@ const DraggableChatbot = () => {
 
       {!isMinimized && (
         <div className="flex flex-col flex-grow overflow-hidden bg-background">
-          {EXTERNAL_CHATBOT_URL === "https://your-external-chatbot-url.com" ? (
+          {EXTERNAL_CHATBOT_URL === "https://your-external-chatbot-url.com" || EXTERNAL_CHATBOT_URL === "" ? ( // Added check for empty string too
             <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground p-4 text-center">
                 <MessageSquare className="w-16 h-16 text-primary/50 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">External Chatbot Placeholder</h3>
