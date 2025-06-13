@@ -1,8 +1,9 @@
+
 import type { Metadata } from 'next';
-import type { ReactNode } from 'react'; // Added import
+import type { ReactNode } from 'react'; 
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-// Removed DraggableChatbot import
+import DraggableChatbot from '@/components/common/draggable-chatbot'; // Import the chatbot
 
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: ReactNode; // Now ReactNode is explicitly imported
+  children: ReactNode; 
 }>) {
   return (
     <html lang="en">
@@ -26,8 +27,10 @@ export default function RootLayout({
       <body className="font-body antialiased">
         {children}
         <Toaster />
-        {/* Removed DraggableChatbot component */}
+        <DraggableChatbot /> {/* Add the chatbot component here */}
       </body>
     </html>
   );
 }
+
+    
