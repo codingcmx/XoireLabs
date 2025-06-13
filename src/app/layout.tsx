@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react'; // Added import
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import DraggableChatbot from '@/components/common/draggable-chatbot';
+// Removed DraggableChatbot import
 
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         {children}
         <Toaster />
-        <DraggableChatbot />
+        {/* Removed DraggableChatbot component */}
       </body>
     </html>
   );
