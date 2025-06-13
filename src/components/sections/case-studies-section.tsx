@@ -11,7 +11,7 @@ interface Testimonial {
   company: string;
   avatar: string;
   aiHint: string;
-  rating: number; // Added rating
+  rating: number; 
 }
 
 const initialTestimonials: Testimonial[] = [
@@ -37,7 +37,7 @@ const initialTestimonials: Testimonial[] = [
     company: "CMO, NovaRetail Group",
     avatar: "https://placehold.co/100x100/FFFFFF/0A0A23.png?text=LH",
     aiHint: "woman face",
-    rating: 5,
+    rating: 4, 
   },
    {
     quote: "The predictive analytics from Xoire gave us a clear edge. We've seen a 25% increase in conversion rates.",
@@ -45,7 +45,7 @@ const initialTestimonials: Testimonial[] = [
     company: "Head of Growth, FutureScope Inc.",
     avatar: "https://placehold.co/100x100/FFD700/0A0A23.png?text=KT",
     aiHint: "asian man",
-    rating: 4,
+    rating: 3.5, 
   },
   {
     quote: "Xoire's team is brilliant. They delivered a complex AI system ahead of schedule and exceeding all expectations.",
@@ -53,7 +53,7 @@ const initialTestimonials: Testimonial[] = [
     company: "CTO, Innovate Solutions",
     avatar: "https://placehold.co/100x100/00CED1/0A0A23.png?text=SA",
     aiHint: "middle eastern woman",
-    rating: 4.5,
+    rating: 4.5, 
   },
 ];
 
@@ -159,3 +159,4 @@ export default function CaseStudiesSection() {
     </section>
   );
 }
+
