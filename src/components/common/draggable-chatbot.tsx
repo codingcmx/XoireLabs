@@ -1,111 +1,81 @@
 
 "use client";
 
-import { useState, useRef, type MouseEvent as ReactMouseEvent, useEffect, type FormEvent } from 'react';
-import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical, Send, Loader2, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-// import { xoireChat, type XoireChatInput, type XoireChatOutput } from '@/ai/flows/xoire-chat-flow'; // Assuming external for now
-import type { MessageData } from 'genkit';
+import { useState, useRef, type MouseEvent as ReactMouseEvent, useEffect } from 'react';
+import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical } from 'lucide-react';
+// Removed Input, ScrollArea, Button (for send), Loader2, Send, Sparkles as internal chat UI is removed
+// Removed FormEvent, xoireChat types, MessageData
 
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'bot';
-  text: string;
-}
-
-// Simulate the types if xoireChat is external for now
-interface XoireChatInput {
-  message: string;
-  history?: MessageData[];
-}
-interface XoireChatOutput {
-  response: string;
-}
-
+// Placeholder for the external chatbot URL - REPLACE THIS WITH YOUR ACTUAL URL
+const EXTERNAL_CHATBOT_URL = "https://your-external-chatbot-url.com";
 
 const DraggableChatbot = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isMinimized, setIsMinimized] = useState(true);
   const [initialPos, setInitialPos] = useState({ x: 0, y: 0 });
   const draggableRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
-
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
   const dragOccurredRef = useRef(false);
-
 
   useEffect(() => {
     setIsMounted(true);
-    // Initial positioning logic
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     const placeChatbot = () => {
       if (!draggableRef.current) return;
       const currentWidth = isMinimized ? 60 : 380;
-      const currentHeight = isMinimized ? 60 : 550;
+      const currentHeight = isMinimized ? 60 : 550; // Height for the expanded iframe
       const initialX = window.innerWidth - currentWidth - 20;
       const initialY = window.innerHeight - currentHeight - 20;
       setPosition({ x: initialX > 0 ? initialX : 0, y: initialY > 0 ? initialY : 0 });
     };
-    placeChatbot(); // Call on mount and when isMinimized changes
 
-    if (!isMinimized && messages.length === 0) {
-      setMessages([{id: 'initial-greeting', role: 'bot', text: "Hello! I'm the Xoire AI Assistant. How can I help you learn about Xoire AI today?"}]);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMinimized, isMounted]); // Removed messages.length from deps to avoid re-greeting on send
+    placeChatbot();
+    window.addEventListener('resize', placeChatbot); // Reposition on resize
 
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
+    return () => {
+      window.removeEventListener('resize', placeChatbot);
+    };
+  }, [isMinimized, isMounted]);
 
 
   const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
-    if (!draggableRef.current) return;
+    if (!draggableRef.current || !position) return;
 
-    // Prevent drag initiation if clicking on interactive elements within the header (buttons for min/close)
-    // This check is primarily for the expanded state.
-    if (!isMinimized) {
-      const targetIsInteractiveInHeader =
-        e.target instanceof HTMLButtonElement ||
-        (e.target as HTMLElement).closest('button');
-      if (targetIsInteractiveInHeader) {
-        return;
-      }
+    const targetIsButton = (e.target as HTMLElement).closest('button');
+    if (targetIsButton) {
+      return; 
     }
-
+    
     setIsDragging(true);
-    const rect = draggableRef.current.getBoundingClientRect();
     setInitialPos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
     });
-    dragOccurredRef.current = false; // Reset for this interaction
+    dragOccurredRef.current = false;
+    if (draggableRef.current) {
+      draggableRef.current.style.willChange = 'transform';
+    }
   };
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging || !draggableRef.current) return;
     e.preventDefault();
-    dragOccurredRef.current = true; // A drag movement happened
+    dragOccurredRef.current = true;
 
     let newX = e.clientX - initialPos.x;
     let newY = e.clientY - initialPos.y;
 
-    // Boundary checks (ensure chat window stays somewhat visible)
     const currentWidth = draggableRef.current.offsetWidth;
     const currentHeight = draggableRef.current.offsetHeight;
-    const safetyMargin = 50; // How much of the chatbot must remain visible
+    const safetyMargin = 50;
 
     newX = Math.max(-currentWidth + safetyMargin, Math.min(newX, window.innerWidth - safetyMargin));
     newY = Math.max(0, Math.min(newY, window.innerHeight - safetyMargin));
-
 
     setPosition({ x: newX, y: newY });
   };
@@ -113,9 +83,10 @@ const DraggableChatbot = () => {
   const handleMouseUp = () => {
     if (isDragging) {
       setIsDragging(false);
+      if (draggableRef.current) {
+        draggableRef.current.style.willChange = 'auto';
+      }
     }
-    // dragOccurredRef.current is now set if a drag happened.
-    // It will be reset on the next mousedown.
   };
 
   useEffect(() => {
@@ -133,69 +104,8 @@ const DraggableChatbot = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging, initialPos]); 
 
-  const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const userMessageText = inputValue.trim();
-    if (!userMessageText || isLoading) return;
-
-    const newUserMessage: ChatMessage = { id: Date.now().toString(), role: 'user', text: userMessageText };
-    setMessages(prev => [...prev, newUserMessage]);
-    setInputValue('');
-    setIsLoading(true);
-    
-    const historyForAPI: MessageData[] = messages
-      .filter(msg => msg.id !== 'initial-greeting')
-      .map(msg => ({
-        role: msg.role === 'bot' ? 'model' : 'user', 
-        parts: [{ text: msg.text }],
-    }));
-
-    const input: XoireChatInput = {
-      message: userMessageText,
-      history: historyForAPI,
-    };
-
-    try {
-      const externalApiUrl = "https://jsonplaceholder.typicode.com/posts"; // Placeholder
-      
-      const response = await fetch(externalApiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(input),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Failed to parse error response" }));
-        throw new Error(errorData.message || `API request failed with status ${response.status}`);
-      }
-      
-      const apiResult = await response.json();
-      const result: XoireChatOutput = { response: apiResult.title || "Placeholder response from external API" };
-
-
-      const botResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: result.response };
-      setMessages(prev => [...prev, botResponse]);
-
-    } catch (error) {
-      console.error("Error calling external chatbot API:", error);
-      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred with the AI chat.";
-      const errorResponse: ChatMessage = { id: (Date.now() + 1).toString(), role: 'bot', text: `Error: ${errorMessage}` };
-      setMessages(prev => [...prev, errorResponse]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
   const toggleMinimize = () => {
-    setIsMinimized(prevMinimized => {
-        const nextMinimized = !prevMinimized;
-        if (!nextMinimized && messages.length === 0) { 
-            setMessages([{id: 'initial-greeting', role: 'bot', text: "Hello! I'm the Xoire AI Assistant. How can I help you learn about Xoire AI today?"}]);
-        }
-        return nextMinimized;
-    });
+    setIsMinimized(prevMinimized => !prevMinimized);
   };
 
   const handleMinimizedClickOrKey = () => {
@@ -203,9 +113,9 @@ const DraggableChatbot = () => {
         toggleMinimize();
     }
   };
-
-  if (!isMounted) {
-    return null;
+  
+  if (!isMounted || position === null) {
+    return null; // Don't render until mounted and position is calculated
   }
 
   return (
@@ -215,17 +125,18 @@ const DraggableChatbot = () => {
         isDragging ? 'cursor-grabbing' : '' 
       }`}
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
+        transform: `translate(${position.x}px, ${position.y}px)`,
         width: isMinimized ? '60px' : '380px',
         height: isMinimized ? '60px' : '550px',
+        opacity: position === null ? 0 : 1, // Hidden until position is set
+        willChange: isDragging ? 'transform' : 'auto',
       }}
     >
       <div
         className={`flex items-center justify-between p-2 bg-primary/10 border-b border-primary/30 ${
           !isMinimized && !isDragging ? 'cursor-grab' : '' 
-        }`}
-        onMouseDown={!isMinimized ? handleMouseDown : undefined} 
+        } ${isMinimized && !isDragging ? 'cursor-grab' : ''}`} // Make minimized state also draggable
+        onMouseDown={handleMouseDown} 
       >
         <div className="flex items-center text-primary select-none">
           {!isMinimized && <GripVertical size={18} className="mr-1 text-primary/50" />}
@@ -254,62 +165,31 @@ const DraggableChatbot = () => {
 
       {!isMinimized && (
         <div className="flex flex-col flex-grow overflow-hidden bg-background">
-          <ScrollArea className="flex-grow p-4 space-y-3" ref={chatContainerRef}>
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-lg px-3 py-2 text-sm shadow-md ${
-                    msg.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {msg.text.split('\\n').map((line, index) => (
-                    <span key={index}>
-                      {line}
-                      {index < msg.text.split('\\n').length - 1 && <br />}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="max-w-[80%] rounded-lg px-3 py-2 text-sm shadow-md bg-muted text-muted-foreground flex items-center">
-                  <Sparkles className="w-4 h-4 mr-2 animate-pulse text-primary" />
-                  <span>Thinking...</span>
-                </div>
-              </div>
-            )}
-          </ScrollArea>
-          <form onSubmit={handleSendMessage} className="p-3 border-t border-primary/30 bg-background">
-            <div className="flex items-center space-x-2">
-              <Input
-                type="text"
-                placeholder="Ask Xoire AI..."
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                className="flex-grow bg-input border-border focus:ring-primary"
-                disabled={isLoading}
-                aria-label="Chat message input"
-              />
-              <Button type="submit" size="icon" disabled={isLoading || !inputValue.trim()} aria-label="Send message">
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              </Button>
+          {EXTERNAL_CHATBOT_URL === "https://your-external-chatbot-url.com" ? (
+            <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground p-4 text-center">
+                <MessageSquare className="w-16 h-16 text-primary/50 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">External Chatbot Placeholder</h3>
+                <p className="text-sm">
+                    Please replace <code className="bg-muted p-1 rounded text-xs">EXTERNAL_CHATBOT_URL</code> in <code className="bg-muted p-1 rounded text-xs">DraggableChatbot.tsx</code> with the actual URL of your hosted chatbot.
+                </p>
             </div>
-          </form>
+          ) : (
+            <iframe
+              src={EXTERNAL_CHATBOT_URL}
+              title="Xoire External AI Assistant"
+              className="w-full h-full border-0"
+              allow="microphone; camera; autoplay; encrypted-media; gyroscope; picture-in-picture" // Add permissions as needed by your external bot
+            />
+          )}
         </div>
       )}
        {isMinimized && (
         <div
             className={`flex-grow flex items-center justify-center ${
-              !isDragging ? 'cursor-grab' : '' 
+              !isDragging ? 'cursor-pointer' : '' // Changed cursor to pointer when not dragging minimized state
             }`}
             onClick={handleMinimizedClickOrKey}
-            onMouseDown={handleMouseDown} 
+            // onMouseDown is handled by the parent header for dragging now
             role="button"
             tabIndex={0}
             aria-label="Expand chat"
@@ -323,5 +203,3 @@ const DraggableChatbot = () => {
 };
 
 export default DraggableChatbot;
-
-      
