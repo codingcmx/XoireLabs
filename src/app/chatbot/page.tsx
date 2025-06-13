@@ -3,7 +3,7 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { MessageSquare } from 'lucide-react';
 
-const CHATBOT_EMBED_URL = "https://xoire-co-assistant-fwh38p0w4-codingcmxs-projects.vercel.app";
+const CHATBOT_EMBED_URL = "https://xoire-co-assistant.vercel.app"; // Updated URL
 
 export default function ChatbotPage() {
   return (
