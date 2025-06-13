@@ -3,10 +3,7 @@
 
 import { useState, useRef, type MouseEvent as ReactMouseEvent, useEffect } from 'react';
 import { Maximize, Minus, MessageSquare, X as CloseIcon, GripVertical } from 'lucide-react';
-// Removed Input, ScrollArea, Button (for send), Loader2, Send, Sparkles as internal chat UI is removed
-// Removed FormEvent, xoireChat types, MessageData
 
-// Placeholder for the external chatbot URL - REPLACE THIS WITH YOUR ACTUAL URL
 const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant.vercel.app";
 
 const DraggableChatbot = () => {
@@ -26,15 +23,16 @@ const DraggableChatbot = () => {
     if (!isMounted) return;
 
     const placeChatbot = () => {
-      if (!draggableRef.current) return;
+      // Removed problematic `if (!draggableRef.current) return;` check for initial placement
+      // currentWidth and currentHeight for initial placement are derived from isMinimized state, not the ref.
       const currentWidth = isMinimized ? 60 : 380;
-      const currentHeight = isMinimized ? 60 : 550; // Height for the expanded iframe
+      const currentHeight = isMinimized ? 60 : 550; 
       const initialX = window.innerWidth - currentWidth - 20;
       const initialY = window.innerHeight - currentHeight - 20;
       setPosition({ x: initialX > 0 ? initialX : 0, y: initialY > 0 ? initialY : 0 });
     };
 
-    placeChatbot();
+    placeChatbot(); // Set initial position
     window.addEventListener('resize', placeChatbot); // Reposition on resize
 
     return () => {
@@ -63,7 +61,7 @@ const DraggableChatbot = () => {
   };
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging || !draggableRef.current) return;
+    if (!isDragging || !draggableRef.current || !position) return; // Added !position check
     e.preventDefault();
     dragOccurredRef.current = true;
 
@@ -72,10 +70,11 @@ const DraggableChatbot = () => {
 
     const currentWidth = draggableRef.current.offsetWidth;
     const currentHeight = draggableRef.current.offsetHeight;
-    const safetyMargin = 50;
+    const safetyMargin = 50; // Keep chatbot somewhat on screen
 
+    // Prevent dragging too far off-screen
     newX = Math.max(-currentWidth + safetyMargin, Math.min(newX, window.innerWidth - safetyMargin));
-    newY = Math.max(0, Math.min(newY, window.innerHeight - safetyMargin));
+    newY = Math.max(0, Math.min(newY, window.innerHeight - safetyMargin)); // Allow pinning to top, but not above
 
     setPosition({ x: newX, y: newY });
   };
@@ -102,7 +101,7 @@ const DraggableChatbot = () => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDragging, initialPos]); 
+  }, [isDragging, initialPos, position]); // Added position to dependencies as it's used in handleMouseMove via closure
 
   const toggleMinimize = () => {
     setIsMinimized(prevMinimized => !prevMinimized);
@@ -115,7 +114,7 @@ const DraggableChatbot = () => {
   };
   
   if (!isMounted || position === null) {
-    return null; // Don't render until mounted and position is calculated
+    return null; 
   }
 
   return (
@@ -128,14 +127,14 @@ const DraggableChatbot = () => {
         transform: `translate(${position.x}px, ${position.y}px)`,
         width: isMinimized ? '60px' : '380px',
         height: isMinimized ? '60px' : '550px',
-        opacity: position === null ? 0 : 1, // Hidden until position is set
+        opacity: 1, // When rendered, opacity is 1. The null check above handles visibility.
         willChange: isDragging ? 'transform' : 'auto',
       }}
     >
       <div
         className={`flex items-center justify-between p-2 bg-primary/10 border-b border-primary/30 ${
           !isMinimized && !isDragging ? 'cursor-grab' : '' 
-        } ${isMinimized && !isDragging ? 'cursor-grab' : ''}`} // Make minimized state also draggable
+        } ${isMinimized && !isDragging ? 'cursor-grab' : ''}`}
         onMouseDown={handleMouseDown} 
       >
         <div className="flex items-center text-primary select-none">
@@ -165,7 +164,7 @@ const DraggableChatbot = () => {
 
       {!isMinimized && (
         <div className="flex flex-col flex-grow overflow-hidden bg-background">
-          {EXTERNAL_CHATBOT_URL === "https://your-external-chatbot-url.com" || EXTERNAL_CHATBOT_URL === "" ? ( // Added check for empty string too
+          {EXTERNAL_CHATBOT_URL === "https://your-external-chatbot-url.com" || EXTERNAL_CHATBOT_URL === "" ? ( 
             <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground p-4 text-center">
                 <MessageSquare className="w-16 h-16 text-primary/50 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">External Chatbot Placeholder</h3>
@@ -178,7 +177,7 @@ const DraggableChatbot = () => {
               src={EXTERNAL_CHATBOT_URL}
               title="Xoire External AI Assistant"
               className="w-full h-full border-0"
-              allow="microphone; camera; autoplay; encrypted-media; gyroscope; picture-in-picture" // Add permissions as needed by your external bot
+              allow="microphone; camera; autoplay; encrypted-media; gyroscope; picture-in-picture" 
             />
           )}
         </div>
@@ -186,10 +185,9 @@ const DraggableChatbot = () => {
        {isMinimized && (
         <div
             className={`flex-grow flex items-center justify-center ${
-              !isDragging ? 'cursor-pointer' : '' // Changed cursor to pointer when not dragging minimized state
+              !isDragging ? 'cursor-pointer' : '' 
             }`}
             onClick={handleMinimizedClickOrKey}
-            // onMouseDown is handled by the parent header for dragging now
             role="button"
             tabIndex={0}
             aria-label="Expand chat"
