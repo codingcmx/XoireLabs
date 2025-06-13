@@ -6,7 +6,7 @@ import { BotMessageSquare, X, Maximize2, Minimize2, MessageSquare, RotateCcw } f
 import { cn } from '@/lib/utils';
 
 // Define the external chatbot URL here
-const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant-git-main-codingcmxs-projects.vercel.app";
+const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant.vercel.app";
 // const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant.vercel.app";
 // const EXTERNAL_CHATBOT_URL = ""; // Example: Set to an empty string to show placeholder
 // const EXTERNAL_CHATBOT_URL = "https://your-external-chatbot-url.com"; // Placeholder for user
@@ -218,6 +218,7 @@ const DraggableChatbot = () => {
               title="AI Assistant Chatbot"
               className="w-full h-full border-0"
               allow="microphone; camera" // Optional, for potential chatbot features
+              loading="lazy"
             ></iframe>
           )}
         </div>
