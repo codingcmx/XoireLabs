@@ -3,8 +3,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import MotionDiv from '@/components/motion/motion-div';
-import { Star, TrendingUp, Users } from 'lucide-react';
-// Removed useState and useEffect for previous rotation logic
+import { Star, StarHalf, TrendingUp, Users } from 'lucide-react';
 
 interface Testimonial {
   quote: string;
@@ -12,6 +11,7 @@ interface Testimonial {
   company: string;
   avatar: string;
   aiHint: string;
+  rating: number; // Added rating
 }
 
 const initialTestimonials: Testimonial[] = [
@@ -21,6 +21,7 @@ const initialTestimonials: Testimonial[] = [
     company: "CEO, QuantumLeap Tech",
     avatar: "https://placehold.co/100x100/BF40BF/0A0A23.png?text=ER",
     aiHint: "woman portrait",
+    rating: 5,
   },
   {
     quote: "The AI trading bot developed by Xoire has consistently outperformed market benchmarks. Their expertise is unparalleled.",
@@ -28,6 +29,7 @@ const initialTestimonials: Testimonial[] = [
     company: "Founder, Apex Capital",
     avatar: "https://placehold.co/100x100/A0A0D0/0A0A23.png?text=MC",
     aiHint: "man portrait",
+    rating: 4.5,
   },
   {
     quote: "Our customer engagement skyrocketed after implementing Xoire's AI chatbot solution. Support costs are down, satisfaction is up.",
@@ -35,6 +37,7 @@ const initialTestimonials: Testimonial[] = [
     company: "CMO, NovaRetail Group",
     avatar: "https://placehold.co/100x100/FFFFFF/0A0A23.png?text=LH",
     aiHint: "woman face",
+    rating: 5,
   },
    {
     quote: "The predictive analytics from Xoire gave us a clear edge. We've seen a 25% increase in conversion rates.",
@@ -42,6 +45,7 @@ const initialTestimonials: Testimonial[] = [
     company: "Head of Growth, FutureScope Inc.",
     avatar: "https://placehold.co/100x100/FFD700/0A0A23.png?text=KT", // Gold accent
     aiHint: "asian man",
+    rating: 4,
   },
   {
     quote: "Xoire's team is brilliant. They delivered a complex AI system ahead of schedule and exceeding all expectations.",
@@ -49,16 +53,41 @@ const initialTestimonials: Testimonial[] = [
     company: "CTO, Innovate Solutions",
     avatar: "https://placehold.co/100x100/00CED1/0A0A23.png?text=SA", // Dark turquoise accent
     aiHint: "middle eastern woman",
+    rating: 4.5,
   },
+  {
+    quote: "Integrating Xoire's automation tools reduced our manual workload by an incredible 60%. Highly recommend!",
+    name: "David Miller",
+    company: "COO, EfficientLogistics Co.",
+    avatar: "https://placehold.co/100x100/32CD32/0A0A23.png?text=DM", // Lime Green accent
+    aiHint: "man face",
+    rating: 5,
+  },
+  {
+    quote: "Their lead generation AI found prospects we never would have. Our sales pipeline has never been healthier.",
+    name: "Aisha Khan",
+    company: "Sales Director, Growth Dynamics",
+    avatar: "https://placehold.co/100x100/FF69B4/0A0A23.png?text=AK", // Hot Pink accent
+    aiHint: "indian woman",
+    rating: 4,
+  },
+  {
+    quote: "The insights from Xoire's AI marketing platform led to a 30% increase in campaign ROI. Essential for modern marketing.",
+    name: "Robert Smith",
+    company: "Marketing VP, MarketBoosters",
+    avatar: "https://placehold.co/100x100/87CEEB/0A0A23.png?text=RS", // Sky Blue accent
+    aiHint: "caucasian man",
+    rating: 3.5,
+  }
 ];
 
 // Duplicate testimonials for seamless scrolling
 const duplicatedTestimonials = [...initialTestimonials, ...initialTestimonials];
 
 const stats = [
-    { value: "$7.4M+", label: "Automated Annually", icon: TrendingUp, color: "text-primary" },
+    { value: "$197k+", label: "Automated Annually", icon: TrendingUp, color: "text-primary" },
     { value: "98%", label: "Client Satisfaction", icon: Star, color: "text-accent" },
-    { value: "150+", label: "AI Systems Deployed", icon: Users, color: "text-primary" },
+    { value: "87+", label: "AI Systems Deployed", icon: Users, color: "text-primary" },
 ];
 
 const sectionVariants = {
@@ -69,6 +98,24 @@ const sectionVariants = {
 const itemVariants = { // Kept for stats cards
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] } },
+};
+
+const renderStars = (rating: number) => {
+  const stars = [];
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+  for (let i = 0; i < fullStars; i++) {
+    stars.push(<Star key={`full-${i}`} className="h-5 w-5 text-primary fill-primary" />);
+  }
+  if (hasHalfStar) {
+    stars.push(<StarHalf key="half" className="h-5 w-5 text-primary fill-primary" />);
+  }
+  for (let i = 0; i < emptyStars; i++) {
+    stars.push(<Star key={`empty-${i}`} className="h-5 w-5 text-primary fill-none" />);
+  }
+  return stars;
 };
 
 
@@ -134,9 +181,7 @@ export default function CaseStudiesSection() {
                     <p className="text-muted-foreground italic">&quot;{testimonial.quote}&quot;</p>
                   </CardContent>
                   <div className="flex mt-4">
-                      {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-5 w-5 text-primary fill-primary" />
-                      ))}
+                      {renderStars(testimonial.rating)}
                   </div>
                 </Card>
               </div>
@@ -147,4 +192,3 @@ export default function CaseStudiesSection() {
     </section>
   );
 }
-
