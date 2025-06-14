@@ -2,8 +2,10 @@
 "use client";
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import MotionDiv from '@/components/motion/motion-div';
+import MotionDiv from '@/components/motion/motion-div'; // Already using MotionDiv for section title and stats
 import { Star, StarHalf, TrendingUp, Users } from 'lucide-react';
+import { motion, useAnimationFrame, useMotionValue } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
 
 interface Testimonial {
   quote: string;
@@ -11,7 +13,7 @@ interface Testimonial {
   company: string;
   avatar: string;
   aiHint: string;
-  rating: number; // Added rating
+  rating: number;
 }
 
 const initialTestimonials: Testimonial[] = [
@@ -43,7 +45,7 @@ const initialTestimonials: Testimonial[] = [
     quote: "The predictive analytics from Xoire gave us a clear edge. We've seen a 25% increase in conversion rates.",
     name: "Kenji Tanaka",
     company: "Head of Growth, FutureScope Inc.",
-    avatar: "https://placehold.co/100x100/FFD700/0A0A23.png?text=KT", // Gold accent
+    avatar: "https://placehold.co/100x100/FFD700/0A0A23.png?text=KT",
     aiHint: "asian man",
     rating: 4,
   },
@@ -51,7 +53,7 @@ const initialTestimonials: Testimonial[] = [
     quote: "Xoire's team is brilliant. They delivered a complex AI system ahead of schedule and exceeding all expectations.",
     name: "Sofia Al-Jamil",
     company: "CTO, Innovate Solutions",
-    avatar: "https://placehold.co/100x100/00CED1/0A0A23.png?text=SA", // Dark turquoise accent
+    avatar: "https://placehold.co/100x100/00CED1/0A0A23.png?text=SA",
     aiHint: "middle eastern woman",
     rating: 4.5,
   },
@@ -59,7 +61,7 @@ const initialTestimonials: Testimonial[] = [
     quote: "Integrating Xoire's automation tools reduced our manual workload by an incredible 60%. Highly recommend!",
     name: "David Miller",
     company: "COO, EfficientLogistics Co.",
-    avatar: "https://placehold.co/100x100/32CD32/0A0A23.png?text=DM", // Lime Green accent
+    avatar: "https://placehold.co/100x100/32CD32/0A0A23.png?text=DM",
     aiHint: "man face",
     rating: 5,
   },
@@ -67,7 +69,7 @@ const initialTestimonials: Testimonial[] = [
     quote: "Their lead generation AI found prospects we never would have. Our sales pipeline has never been healthier.",
     name: "Aisha Khan",
     company: "Sales Director, Growth Dynamics",
-    avatar: "https://placehold.co/100x100/FF69B4/0A0A23.png?text=AK", // Hot Pink accent
+    avatar: "https://placehold.co/100x100/FF69B4/0A0A23.png?text=AK",
     aiHint: "indian woman",
     rating: 4,
   },
@@ -75,14 +77,11 @@ const initialTestimonials: Testimonial[] = [
     quote: "The insights from Xoire's AI marketing platform led to a 30% increase in campaign ROI. Essential for modern marketing.",
     name: "Robert Smith",
     company: "Marketing VP, MarketBoosters",
-    avatar: "https://placehold.co/100x100/87CEEB/0A0A23.png?text=RS", // Sky Blue accent
+    avatar: "https://placehold.co/100x100/87CEEB/0A0A23.png?text=RS",
     aiHint: "caucasian man",
     rating: 3.5,
   }
 ];
-
-// Duplicate testimonials for seamless scrolling
-const duplicatedTestimonials = [...initialTestimonials, ...initialTestimonials];
 
 const stats = [
     { value: "$197k+", label: "Automated Annually", icon: TrendingUp, color: "text-primary" },
@@ -95,7 +94,7 @@ const sectionVariants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.2, duration: 0.5 } },
 };
 
-const itemVariants = { // Kept for stats cards
+const itemVariants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] } },
 };
@@ -118,10 +117,41 @@ const renderStars = (rating: number) => {
   return stars;
 };
 
+const CARD_WIDTH_DEFAULT = 360; // Default card width in pixels (approx w-90 on Tailwind scale)
+const RADIUS_DEFAULT = 400; // Default radius of the wheel in pixels
+const CARD_ASPECT_RATIO = 4 / 5; // Approximate aspect ratio for card height
 
 export default function CaseStudiesSection() {
+  const [radius, setRadius] = useState(RADIUS_DEFAULT);
+  const [cardWidth, setCardWidth] = useState(CARD_WIDTH_DEFAULT);
+  const [cardHeight, setCardHeight] = useState(CARD_WIDTH_DEFAULT / CARD_ASPECT_RATIO);
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (typeof window !== 'undefined') {
+        const newCardWidth = window.innerWidth < 768 ? 280 : (window.innerWidth < 1024 ? 320 : CARD_WIDTH_DEFAULT);
+        const newRadius = window.innerWidth < 768 ? 300 : (window.innerWidth < 1024 ? 350 : RADIUS_DEFAULT);
+        setCardWidth(newCardWidth);
+        setRadius(newRadius);
+        setCardHeight(newCardWidth / CARD_ASPECT_RATIO);
+      }
+    };
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  const rotation = useMotionValue(0);
+  const [isHovering, setIsHovering] = useState(false);
+
+  useAnimationFrame((time, delta) => {
+    const baseSpeed = 8; // degrees per second
+    const speed = isHovering ? baseSpeed / 4 : baseSpeed;
+    rotation.set(rotation.get() + (delta / 1000) * speed);
+  });
+
   return (
-    <section id="case-studies" className="py-20 md:py-32 bg-background">
+    <section id="case-studies" className="py-20 md:py-32 bg-background overflow-hidden">
       <div className="container">
         <MotionDiv 
           initial={{ opacity: 0, y: -20 }}
@@ -137,7 +167,7 @@ export default function CaseStudiesSection() {
         </MotionDiv>
 
         <MotionDiv 
-          className="grid md:grid-cols-3 gap-8 mb-16"
+          className="grid md:grid-cols-3 gap-8 mb-20" // Increased mb
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
@@ -154,39 +184,69 @@ export default function CaseStudiesSection() {
           ))}
         </MotionDiv>
 
-        {/* Testimonial Carousel */}
-        <div className="relative w-full overflow-hidden group">
-          <div 
-            className="flex animate-scroll-testimonials group-hover:[animation-play-state:paused]"
-            style={{ willChange: 'transform' }}
+        {/* 3D Testimonial Wheel */}
+        <div
+          className="relative w-full flex items-center justify-center"
+          style={{
+            height: `${cardHeight + 50}px`, // Ensure enough vertical space for cards
+            perspective: '1500px',
+          }}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          <motion.div
+            className="relative"
+            style={{
+              transformStyle: 'preserve-3d',
+              rotateY: rotation,
+              width: `${cardWidth}px`,
+              height: `${cardHeight}px`,
+            }}
           >
-            {duplicatedTestimonials.map((testimonial, index) => (
-              <div key={`${testimonial.name}-${index}`} className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-4">
-                <Card className="glassmorphic h-full flex flex-col p-6 border-primary/30 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 transform hover:-translate-y-2">
-                  <CardContent className="pt-6 flex-grow">
-                    <div className="flex items-center mb-4">
-                      <Image
-                        src={testimonial.avatar}
-                        alt={testimonial.name}
-                        width={60}
-                        height={60}
-                        className="rounded-full mr-4 border-2 border-primary"
-                        data-ai-hint={testimonial.aiHint}
-                      />
-                      <div>
-                        <CardTitle className="text-lg font-semibold text-foreground">{testimonial.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{testimonial.company}</p>
+            {initialTestimonials.map((testimonial, index) => {
+              const angleDeg = (index / initialTestimonials.length) * 360;
+              return (
+                <motion.div
+                  key={`${testimonial.name}-${index}`}
+                  className="absolute top-0 left-0 flex items-center justify-center"
+                  style={{
+                    width: `${cardWidth}px`,
+                    height: `${cardHeight}px`,
+                    transformOrigin: 'center center',
+                    transform: `rotateY(${angleDeg}deg) translateZ(${radius}px)`,
+                    backfaceVisibility: 'hidden', // Hide back of cards
+                  }}
+                >
+                  <Card 
+                    className="glassmorphic w-full h-full flex flex-col p-6 border-primary/30 shadow-lg"
+                    // Add a subtle counter-rotation to keep card faces towards the viewer
+                    // or adjust lighting/shading if cards are allowed to show their "sides"
+                  >
+                    <CardContent className="pt-6 flex-grow flex flex-col">
+                      <div className="flex items-center mb-4">
+                        <Image
+                          src={testimonial.avatar}
+                          alt={testimonial.name}
+                          width={60}
+                          height={60}
+                          className="rounded-full mr-4 border-2 border-primary"
+                          data-ai-hint={testimonial.aiHint}
+                        />
+                        <div>
+                          <CardTitle className="text-lg font-semibold text-foreground">{testimonial.name}</CardTitle>
+                          <p className="text-sm text-muted-foreground">{testimonial.company}</p>
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-muted-foreground italic">&quot;{testimonial.quote}&quot;</p>
-                  </CardContent>
-                  <div className="flex mt-4">
-                      {renderStars(testimonial.rating)}
-                  </div>
-                </Card>
-              </div>
-            ))}
-          </div>
+                      <p className="text-muted-foreground italic text-sm mb-4 flex-grow">&quot;{testimonial.quote}&quot;</p>
+                       <div className="flex mt-auto"> 
+                        {renderStars(testimonial.rating)}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         </div>
       </div>
     </section>
