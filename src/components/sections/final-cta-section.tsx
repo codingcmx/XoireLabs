@@ -3,12 +3,10 @@
 import { Button } from '@/components/ui/button';
 import MotionDiv from '@/components/motion/motion-div';
 import { ArrowRight, Sparkles, Mail, MessageSquare } from 'lucide-react';
-import Link from 'next/link'; // Import Link
+import Link from 'next/link'; 
 import ContactForm from '@/components/common/contact-form';
 
-// Removed FinalCtaSectionProps interface
-
-export default function FinalCtaSection() { // Removed onTriggerBookingModal prop
+export default function FinalCtaSection() { 
   return (
     <section id="contact" className="py-20 md:py-32 bg-background relative overflow-hidden">
       <div className="absolute inset-0 z-0 opacity-20">
@@ -39,12 +37,20 @@ export default function FinalCtaSection() { // Removed onTriggerBookingModal pro
             Get in Touch & Start Your AI Journey
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Have questions or ready to discuss your project? Fill out the form below or schedule a direct consultation. Let Xoire AI be your catalyst for transformation.
+            Have questions or ready to discuss your project? Fill out the form below. Let Xoire AI be your catalyst for transformation.
           </p>
           
           <ContactForm />
           
-          <div className="mt-10 text-center">
+        </MotionDiv>
+
+        <MotionDiv
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-12 text-center max-w-3xl mx-auto"
+        >
             <p className="text-muted-foreground mb-4">Or, book a meeting directly:</p>
             <Button size="lg" className="text-xl px-10 py-7 group hover:bg-primary/80" asChild>
               <Link href="/book-meeting">
@@ -52,7 +58,6 @@ export default function FinalCtaSection() { // Removed onTriggerBookingModal pro
                 <MessageSquare className="ml-3 h-6 w-6 group-hover:animate-pulse" />
               </Link>
             </Button>
-          </div>
         </MotionDiv>
       </div>
     </section>
