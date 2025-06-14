@@ -2,10 +2,10 @@
 "use client";
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import MotionDiv from '@/components/motion/motion-div'; // Already using MotionDiv for section title and stats
+import MotionDiv from '@/components/motion/motion-div'; 
 import { Star, StarHalf, TrendingUp, Users } from 'lucide-react';
-import { motion, useAnimationFrame, useMotionValue } from 'framer-motion';
-import { useRef, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { useRef, useEffect, useState, useMemo } from 'react';
 
 interface Testimonial {
   quote: string;
@@ -117,23 +117,18 @@ const renderStars = (rating: number) => {
   return stars;
 };
 
-const CARD_WIDTH_DEFAULT = 360; // Default card width in pixels (approx w-90 on Tailwind scale)
-const RADIUS_DEFAULT = 400; // Default radius of the wheel in pixels
-const CARD_ASPECT_RATIO = 4 / 5; // Approximate aspect ratio for card height
+const CARD_WIDTH_DEFAULT = 360; 
+const GAP_SIZE = 16; // 1rem gap
 
 export default function CaseStudiesSection() {
-  const [radius, setRadius] = useState(RADIUS_DEFAULT);
   const [cardWidth, setCardWidth] = useState(CARD_WIDTH_DEFAULT);
-  const [cardHeight, setCardHeight] = useState(CARD_WIDTH_DEFAULT / CARD_ASPECT_RATIO);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     const updateDimensions = () => {
       if (typeof window !== 'undefined') {
         const newCardWidth = window.innerWidth < 768 ? 280 : (window.innerWidth < 1024 ? 320 : CARD_WIDTH_DEFAULT);
-        const newRadius = window.innerWidth < 768 ? 300 : (window.innerWidth < 1024 ? 350 : RADIUS_DEFAULT);
         setCardWidth(newCardWidth);
-        setRadius(newRadius);
-        setCardHeight(newCardWidth / CARD_ASPECT_RATIO);
       }
     };
     updateDimensions();
@@ -141,14 +136,12 @@ export default function CaseStudiesSection() {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  const rotation = useMotionValue(0);
-  const [isHovering, setIsHovering] = useState(false);
+  const doubledTestimonials = useMemo(() => [...initialTestimonials, ...initialTestimonials], []);
+  const singleSetWidth = initialTestimonials.length * (cardWidth + GAP_SIZE);
 
-  useAnimationFrame((time, delta) => {
-    const baseSpeed = 8; // degrees per second
-    const speed = isHovering ? baseSpeed / 4 : baseSpeed;
-    rotation.set(rotation.get() + (delta / 1000) * speed);
-  });
+  const DURATION_NORMAL = initialTestimonials.length * 5; // Base speed: 5 seconds per card
+  const DURATION_HOVER = DURATION_NORMAL * 3; // 3x slower on hover
+  const animationDuration = isHovering ? DURATION_HOVER : DURATION_NORMAL;
 
   return (
     <section id="case-studies" className="py-20 md:py-32 bg-background overflow-hidden">
@@ -167,7 +160,7 @@ export default function CaseStudiesSection() {
         </MotionDiv>
 
         <MotionDiv 
-          className="grid md:grid-cols-3 gap-8 mb-20" // Increased mb
+          className="grid md:grid-cols-3 gap-8 mb-20"
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
@@ -184,71 +177,68 @@ export default function CaseStudiesSection() {
           ))}
         </MotionDiv>
 
-        {/* 3D Testimonial Wheel */}
+        {/* Horizontal Infinite Marquee */}
         <div
-          className="relative w-full flex items-center justify-center"
-          style={{
-            height: `${cardHeight + 50}px`, // Ensure enough vertical space for cards
-            perspective: '1500px',
-          }}
+          className="w-full overflow-hidden relative" // Added relative for potential gradient overlays
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
+          {/* Optional: Fade out edges for a softer look */}
+          {/* <div className="absolute top-0 left-0 bottom-0 w-16 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div> */}
+          {/* <div className="absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div> */}
+          
           <motion.div
-            className="relative"
-            style={{
-              transformStyle: 'preserve-3d',
-              rotateY: rotation,
-              width: `${cardWidth}px`,
-              height: `${cardHeight}px`,
+            className="flex" // The track that moves
+            animate={{ x: [0, -singleSetWidth] }}
+            transition={{
+              x: {
+                repeat: Infinity,
+                repeatType: "loop",
+                duration: animationDuration,
+                ease: "linear",
+              },
             }}
           >
-            {initialTestimonials.map((testimonial, index) => {
-              const angleDeg = (index / initialTestimonials.length) * 360;
-              return (
-                <motion.div
-                  key={`${testimonial.name}-${index}`}
-                  className="absolute top-0 left-0 flex items-center justify-center"
-                  style={{
-                    width: `${cardWidth}px`,
-                    height: `${cardHeight}px`,
-                    transformOrigin: 'center center',
-                    transform: `rotateY(${angleDeg}deg) translateZ(${radius}px)`,
-                    backfaceVisibility: 'hidden', // Hide back of cards
-                  }}
+            {doubledTestimonials.map((testimonial, index) => (
+              <div
+                key={`${testimonial.name}-${testimonial.company}-${index}`} // More unique key for duplicated items
+                style={{
+                  width: `${cardWidth}px`,
+                  marginRight: `${GAP_SIZE}px`, // Apply gap to all but conceptual last
+                  flexShrink: 0,
+                }}
+                className="h-full" // Ensure wrapper takes full height for card
+              >
+                <Card 
+                  className="glassmorphic h-full flex flex-col p-6 border-primary/30 shadow-lg"
                 >
-                  <Card 
-                    className="glassmorphic w-full h-full flex flex-col p-6 border-primary/30 shadow-lg"
-                    // Add a subtle counter-rotation to keep card faces towards the viewer
-                    // or adjust lighting/shading if cards are allowed to show their "sides"
-                  >
-                    <CardContent className="pt-6 flex-grow flex flex-col">
-                      <div className="flex items-center mb-4">
-                        <Image
-                          src={testimonial.avatar}
-                          alt={testimonial.name}
-                          width={60}
-                          height={60}
-                          className="rounded-full mr-4 border-2 border-primary"
-                          data-ai-hint={testimonial.aiHint}
-                        />
-                        <div>
-                          <CardTitle className="text-lg font-semibold text-foreground">{testimonial.name}</CardTitle>
-                          <p className="text-sm text-muted-foreground">{testimonial.company}</p>
-                        </div>
+                  <CardContent className="pt-6 flex-grow flex flex-col">
+                    <div className="flex items-center mb-4">
+                      <Image
+                        src={testimonial.avatar}
+                        alt={testimonial.name}
+                        width={60}
+                        height={60}
+                        className="rounded-full mr-4 border-2 border-primary"
+                        data-ai-hint={testimonial.aiHint}
+                      />
+                      <div>
+                        <CardTitle className="text-lg font-semibold text-foreground">{testimonial.name}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{testimonial.company}</p>
                       </div>
-                      <p className="text-muted-foreground italic text-sm mb-4 flex-grow">&quot;{testimonial.quote}&quot;</p>
-                       <div className="flex mt-auto"> 
-                        {renderStars(testimonial.rating)}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
+                    </div>
+                    <p className="text-muted-foreground italic text-sm mb-4 flex-grow">&quot;{testimonial.quote}&quot;</p>
+                    <div className="flex mt-auto"> 
+                      {renderStars(testimonial.rating)}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
           </motion.div>
         </div>
       </div>
     </section>
   );
 }
+
