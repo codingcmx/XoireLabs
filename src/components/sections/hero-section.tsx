@@ -10,7 +10,7 @@ import { generateImage, type GenerateImageInput } from '@/ai/flows/generate-imag
 import Link from 'next/link'; 
 
 const ORIGINAL_ORB_IMAGE_URL = "https://placehold.co/800x800.png";
-const ORB_IMAGE_AI_HINT = "blue swirling galaxy planet";
+const ORB_IMAGE_AI_HINT = "glowing network sphere";
 
 
 export default function HeroSection() { 
@@ -202,3 +202,4 @@ export default function HeroSection() {
     </section>
   );
 }
+
