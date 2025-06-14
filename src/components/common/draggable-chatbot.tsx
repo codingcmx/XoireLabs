@@ -7,12 +7,11 @@ import { cn } from '@/lib/utils';
 
 // Define the external chatbot URL here
 const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant.vercel.app";
-// const EXTERNAL_CHATBOT_URL = "https://your-external-chatbot-url.com"; // Placeholder for user
 
 const MINIMIZED_WIDTH = 60;
 const MINIMIZED_HEIGHT = 60;
-const EXPANDED_WIDTH = 400; // Increased from 380
-const EXPANDED_HEIGHT = 620; // Increased from 550
+const EXPANDED_WIDTH = 410; // Increased from 400
+const EXPANDED_HEIGHT = 680; // Increased from 620
 const HEADER_HEIGHT = 48; // Approx height of the header bar
 
 interface Position {
@@ -43,15 +42,22 @@ const DraggableChatbot = () => {
   };
 
   useEffect(() => {
-    placeChatbot(); // Initial placement
+    // Initial placement logic removed from here, handled by the effect below with isReady
     window.addEventListener('resize', placeChatbot);
     return () => window.removeEventListener('resize', placeChatbot);
-  }, [isMinimized, isReady]); // Re-run on minimize/expand and when isReady changes
+  }, [isMinimized]); // Re-run on minimize/expand
+
+  useEffect(() => {
+    // This effect runs once on mount and when isMinimized changes,
+    // ensuring placeChatbot is called after the DOM is ready and dimensions are known.
+    placeChatbot();
+  }, [isMinimized, isReady]); // Depend on isReady to ensure it runs after initial setup if needed
 
   const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
     if (!draggableRef.current) return;
     const target = e.target as HTMLElement;
-    if (!target.closest('.chatbot-drag-handle')) return;
+    // Allow dragging only via the header or if minimized (the whole thing is a drag handle)
+    if (!isMinimized && !target.closest('.chatbot-drag-handle')) return;
 
     setIsDragging(true);
     const rect = draggableRef.current.getBoundingClientRect();
@@ -60,7 +66,7 @@ const DraggableChatbot = () => {
       y: e.clientY - rect.top,
     });
     document.body.style.userSelect = 'none';
-    e.preventDefault();
+    e.preventDefault(); // Prevent text selection while dragging
   };
 
   useEffect(() => {
@@ -70,11 +76,12 @@ const DraggableChatbot = () => {
       let newX = e.clientX - dragOffset.x;
       let newY = e.clientY - dragOffset.y;
 
-      const currentWidth = draggableRef.current.offsetWidth;
-      const currentHeight = draggableRef.current.offsetHeight;
+      // Use the component's current dimensions for boundary checks
+      const componentWidth = draggableRef.current.offsetWidth;
+      const componentHeight = draggableRef.current.offsetHeight;
       
-      newX = Math.max(0, Math.min(newX, window.innerWidth - currentWidth));
-      newY = Math.max(0, Math.min(newY, window.innerHeight - currentHeight));
+      newX = Math.max(0, Math.min(newX, window.innerWidth - componentWidth));
+      newY = Math.max(0, Math.min(newY, window.innerHeight - componentHeight));
       
       setPosition({ x: newX, y: newY });
     };
@@ -94,12 +101,13 @@ const DraggableChatbot = () => {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.userSelect = '';
+      document.body.style.userSelect = ''; // Clean up on unmount or if dragging stops
     };
   }, [isDragging, dragOffset]);
 
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
+    // No need to call placeChatbot here, useEffect for isMinimized will handle it
   };
   
   const handleReloadIframe = () => {
@@ -121,7 +129,8 @@ const DraggableChatbot = () => {
     }
   };
 
-  const showPlaceholder = !EXTERNAL_CHATBOT_URL || !isValidUrl(EXTERNAL_CHATBOT_URL);
+  const showPlaceholder = !EXTERNAL_CHATBOT_URL || !isValidUrl(EXTERNAL_CHATBOT_URL) || EXTERNAL_CHATBOT_URL === "https://your-external-chatbot-url.com";
+
 
   return (
     <div
@@ -129,9 +138,9 @@ const DraggableChatbot = () => {
       className={cn(
         "fixed z-[9999] bg-card text-card-foreground rounded-lg shadow-2xl border border-primary/30 overflow-hidden transition-all duration-300 ease-in-out",
         isDragging && "cursor-grabbing shadow-primary/50 scale-105",
-        !isDragging && "cursor-grab",
-        isMinimized ? "p-0" : "p-0", 
-        isReady ? "opacity-100" : "opacity-0 pointer-events-none" 
+        !isDragging && (isMinimized ? "cursor-pointer" : "cursor-grab"), // Grab cursor for header
+        isMinimized ? "p-0" : "p-0", // Padding handled by inner elements
+        isReady ? "opacity-100" : "opacity-0 pointer-events-none" // Control visibility
       )}
       style={{
         left: `${position.x}px`,
@@ -139,28 +148,26 @@ const DraggableChatbot = () => {
         width: isMinimized ? `${MINIMIZED_WIDTH}px` : `${EXPANDED_WIDTH}px`,
         height: isMinimized ? `${MINIMIZED_HEIGHT}px` : `${EXPANDED_HEIGHT}px`,
       }}
-      onMouseDown={handleMouseDown}
-      onKeyDown={handleKeyDown}
-      tabIndex={0} 
+      onMouseDown={handleMouseDown} // Mouse down on the whole div
+      onKeyDown={handleKeyDown} // For Esc key
+      tabIndex={0} // Make it focusable
       aria-label={isMinimized ? "Open AI Assistant" : "AI Assistant Window"}
-      role="dialog" 
+      role="dialog" // Appropriate role
       aria-modal={!isMinimized}
     >
-      {/* Header Bar */}
+      {/* Header Bar - acts as drag handle when expanded */}
       <div 
         className={cn(
-          "chatbot-drag-handle h-12 bg-primary text-primary-foreground flex items-center justify-between px-3 select-none cursor-inherit",
-          isMinimized && "rounded-lg" 
+          "chatbot-drag-handle h-12 bg-primary text-primary-foreground flex items-center justify-between px-3 select-none",
+          isMinimized && "rounded-lg cursor-pointer w-full h-full", // Full area clickable when minimized
+          !isMinimized && "cursor-inherit" // Inherit grab cursor when expanded
         )}
+        onClick={isMinimized ? toggleMinimize : undefined} // Toggle on click only when minimized
       >
         {isMinimized ? (
-          <button
-            onClick={toggleMinimize}
-            className="w-full h-full flex items-center justify-center text-primary-foreground hover:bg-primary/80 rounded-lg transition-colors"
-            aria-label="Open AI Assistant"
-          >
+          <div className="w-full h-full flex items-center justify-center"> {/* Ensure icon is centered */}
             <MessageSquare className="w-6 h-6" />
-          </button>
+          </div>
         ) : (
           <>
             <div className="flex items-center">
@@ -185,9 +192,9 @@ const DraggableChatbot = () => {
                 {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
               </button>
                <button 
-                onClick={toggleMinimize} 
+                onClick={toggleMinimize} // This button now effectively acts as a close by minimizing
                 className="p-1.5 hover:bg-red-500/80 rounded-md transition-colors" 
-                aria-label="Close Chatbot"
+                aria-label="Close Chatbot" // "Close" is more intuitive than minimize for the X icon
                 title="Close Chatbot"
               >
                 <X className="w-4 h-4" />
