@@ -10,7 +10,7 @@ import { generateImage, type GenerateImageInput } from '@/ai/flows/generate-imag
 import Link from 'next/link'; 
 
 const ORIGINAL_ORB_IMAGE_URL = "https://placehold.co/800x800.png";
-const ORB_IMAGE_AI_HINT = "transparent 3d wireframe orb glowing connections";
+const ORB_IMAGE_AI_HINT = "3d wireframe orb with glowing connections, where the gaps in the wireframe have alpha channel transparency to allow the underlying website background to show through";
 
 
 export default function HeroSection() { 
