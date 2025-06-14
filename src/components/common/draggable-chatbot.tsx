@@ -7,14 +7,12 @@ import { cn } from '@/lib/utils';
 
 // Define the external chatbot URL here
 const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant.vercel.app";
-// const EXTERNAL_CHATBOT_URL = "https://xoire-co-assistant.vercel.app";
-// const EXTERNAL_CHATBOT_URL = ""; // Example: Set to an empty string to show placeholder
 // const EXTERNAL_CHATBOT_URL = "https://your-external-chatbot-url.com"; // Placeholder for user
 
 const MINIMIZED_WIDTH = 60;
 const MINIMIZED_HEIGHT = 60;
-const EXPANDED_WIDTH = 380;
-const EXPANDED_HEIGHT = 550;
+const EXPANDED_WIDTH = 400; // Increased from 380
+const EXPANDED_HEIGHT = 620; // Increased from 550
 const HEADER_HEIGHT = 48; // Approx height of the header bar
 
 interface Position {
@@ -48,7 +46,7 @@ const DraggableChatbot = () => {
     placeChatbot(); // Initial placement
     window.addEventListener('resize', placeChatbot);
     return () => window.removeEventListener('resize', placeChatbot);
-  }, [isMinimized]); // Re-run on minimize/expand
+  }, [isMinimized, isReady]); // Re-run on minimize/expand and when isReady changes
 
   const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
     if (!draggableRef.current) return;
@@ -210,6 +208,9 @@ const DraggableChatbot = () => {
                 Please set a valid <code className="bg-muted px-1 py-0.5 rounded text-xs">EXTERNAL_CHATBOT_URL</code> in <br/>
                 <code className="bg-muted px-1 py-0.5 rounded text-xs">src/components/common/draggable-chatbot.tsx</code>.
               </p>
+               <p className="text-xs mt-2">
+                (e.g., <code className="bg-muted px-1 py-0.5 rounded text-xs">https://your-chatbot.vercel.app</code>)
+              </p>
             </div>
           ) : (
             <iframe
@@ -228,4 +229,3 @@ const DraggableChatbot = () => {
 };
 
 export default DraggableChatbot;
-
