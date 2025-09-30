@@ -131,7 +131,6 @@ const DraggableChatbot = () => {
 
   const showPlaceholder = !EXTERNAL_CHATBOT_URL || !isValidUrl(EXTERNAL_CHATBOT_URL) || EXTERNAL_CHATBOT_URL === "https://your-external-chatbot-url.com";
 
-
   return (
     <div
       ref={draggableRef}
@@ -222,7 +221,7 @@ const DraggableChatbot = () => {
           ) : (
             <iframe
               key={iframeKey} // Use key to force re-render on reload
-              src={EXTERNAL_CHATBOT_URL}
+              src={EXTERNAL_CHAbot_URL}
               title="AI Assistant Chatbot"
               className="w-full h-full border-0"
               allow="microphone; camera" // Optional, for potential chatbot features

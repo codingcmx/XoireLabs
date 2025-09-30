@@ -1,5 +1,6 @@
 
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react'; 
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import DraggableChatbot from '@/components/common/draggable-chatbot';
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode; 
 }>) {
   return (
     <html lang="en">
@@ -30,3 +31,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+    

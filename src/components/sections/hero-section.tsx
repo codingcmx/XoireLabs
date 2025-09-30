@@ -5,13 +5,21 @@ import { Button } from '@/components/ui/button';
 import MotionDiv from '@/components/motion/motion-div';
 import { ArrowRight, Zap, Star, MoveRight } from 'lucide-react';
 import { useScroll, useTransform, motion } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, type CSSProperties } from 'react';
 import { generateImage, type GenerateImageInput } from '@/ai/flows/generate-image-flow';
 import Link from 'next/link'; 
 
 const ORIGINAL_ORB_IMAGE_URL = "https://placehold.co/800x800.png";
 const ORB_IMAGE_AI_HINT = "3d wireframe orb with glowing connections, where the gaps in the wireframe have alpha channel transparency to allow the underlying website background to show through";
 
+interface StarStyle extends CSSProperties {
+  left: string;
+  top: string;
+  width: string;
+  height: string;
+  animationDelay: string;
+  animationDuration: string;
+}
 
 export default function HeroSection() { 
   const targetRef = useRef<HTMLDivElement>(null);
@@ -20,10 +28,18 @@ export default function HeroSection() {
     offset: ["start start", "end start"],
   });
 
-  const [orbImageUrl, setOrbImageUrl] = useState(ORIGINAL_ORB_IMAGE_URL);
+  const [orbImageUrl, setOrbImageUrl] = useState("/ai-orb.png");
   const [isOrbImageLoading, setIsOrbImageLoading] = useState(true);
+  const [starStyles, setStarStyles] = useState<StarStyle[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     async function fetchAiImage() {
       setIsOrbImageLoading(true);
       try {
@@ -41,7 +57,23 @@ export default function HeroSection() {
       }
     }
     fetchAiImage();
-  }, []);
+
+    const generateStarStyles = () => {
+      const styles: StarStyle[] = [];
+      for (let i = 0; i < 100; i++) {
+        styles.push({
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          width: `${Math.random() * 2 + 1}px`,
+          height: `${Math.random() * 2 + 1}px`,
+          animationDelay: `${Math.random() * 5}s`,
+          animationDuration: `${Math.random() * 5 + 5}s`,
+        });
+      }
+      setStarStyles(styles);
+    };
+    generateStarStyles();
+  }, [isMounted]);
 
   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
   const yText = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
@@ -93,18 +125,11 @@ export default function HeroSection() {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-background via-indigo-950/80 to-purple-950/60 animate-morph-gradient opacity-80"></div>
         <div className="absolute inset-0 z-[-1] star-field">
-          {[...Array(100)].map((_, i) => (
+          {isMounted && starStyles.map((style, i) => (
             <Star
               key={`star-${i}`}
               className="absolute animate-star-twinkle text-slate-400"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: `${Math.random() * 2 + 1}px`,
-                height: `${Math.random() * 2 + 1}px`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${Math.random() * 5 + 5}s`,
-              }}
+              style={style}
               strokeWidth={0.5}
               fill="currentColor"
             />
@@ -186,15 +211,28 @@ export default function HeroSection() {
             animate={{ rotate: 360 }}
             transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
           >
-            <Image
-              src={orbImageUrl}
-              alt="AI Orb - Swirling Galaxy Planet"
-              width={800}
-              height={800}
-              className={`rounded-full object-cover w-full h-full transition-all duration-1000 ease-in-out ${isOrbImageLoading ? 'blur-md opacity-30' : 'blur-0 opacity-100'} group-hover:opacity-90`}
-              data-ai-hint={ORB_IMAGE_AI_HINT}
-              priority
-            />
+            {isMounted && (
+                <Image
+                src={orbImageUrl}
+                alt="AI Orb - Swirling Galaxy Planet"
+                width={800}
+                height={800}
+                className={`rounded-full object-cover w-full h-full transition-all duration-1000 ease-in-out ${isOrbImageLoading || !orbImageUrl.startsWith('data:') ? 'blur-md opacity-30' : 'blur-0 opacity-100'} group-hover:opacity-90`}
+                data-ai-hint={ORB_IMAGE_AI_HINT}
+                priority={!orbImageUrl.startsWith('data:')} // only placeholder is priority before AI image loads
+                />
+            )}
+            {!isMounted && ( // Placeholder while not mounted or AI image is loading
+                <Image
+                src={ORIGINAL_ORB_IMAGE_URL} // Use original placeholder directly
+                alt="AI Orb Placeholder"
+                width={800}
+                height={800}
+                className="rounded-full object-cover w-full h-full blur-md opacity-30"
+                data-ai-hint={ORB_IMAGE_AI_HINT}
+                priority
+                />
+            )}
             <div className="absolute inset-0 rounded-full shadow-[0_0_80px_30px_hsl(var(--primary)/0.5),_inset_0_0_40px_10px_hsl(var(--accent)/0.4)] opacity-70 group-hover:opacity-100 transition-opacity animate-subtle-pulse"></div>
           </motion.div>
         </motion.div>
