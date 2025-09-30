@@ -221,7 +221,7 @@ const DraggableChatbot = () => {
           ) : (
             <iframe
               key={iframeKey} // Use key to force re-render on reload
-              src={EXTERNAL_CHAbot_URL}
+              src={EXTERNAL_CHATBOT_URL}
               title="AI Assistant Chatbot"
               className="w-full h-full border-0"
               allow="microphone; camera" // Optional, for potential chatbot features
@@ -235,3 +235,5 @@ const DraggableChatbot = () => {
 };
 
 export default DraggableChatbot;
+
+    
